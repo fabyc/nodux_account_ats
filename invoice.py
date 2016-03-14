@@ -4,8 +4,14 @@ from trytond.pyson import Eval
 from trytond.model import ModelSQL, Workflow, fields, ModelView
 from trytond.report import Report
 from trytond.transaction import Transaction
+from trytond.pool import Pool, PoolMeta
+
 import time
+__all__ = ['Invoice']
+__metaclass__ = PoolMeta
+
 _FORMAS = [
+('', ''),
 ('01', u'SIN UTILIZACIÓN DEL SISTEMA FINANCIERO'),
 ('02', u'CHEQUE PROPIO'),
 ('03', u'CHEQUE CERTIFICADO'),
@@ -29,12 +35,10 @@ class Invoice():
     
     formas_de_pago = fields.Selection(_FORMAS, 'Formas de Pago', states={
             'invisible': Eval('type') != 'in_invoice',
-            'required': Eval('total_amount') > 1000,
             }, help = u'Seleccionar una forma de pago, cuando monto a pagar sea mayor a $1000')
       
-    numero_autorizacion = field.Char(u'Número de autorización', size=49, states={
+    numero_autorizacion = fields.Char(u'Número de autorización', size=49, states={
             'invisible': Eval('type') != 'in_invoice',
-            'required' : Eval('type') == 'in_invoice',
             })
             
     impuestos_ats_renta = fields.Many2One('account.tax', 'Impuesto Renta ATS')

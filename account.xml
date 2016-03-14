@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data>
+        <!-- ATS-->
+        <record model="ir.ui.view" id="print_ats_start_view_form">
+            <field name="model">nodux_account_ats.print_ats.start</field>
+            <field name="type">form</field>
+            <field name="name">ats_export_start_form</field>
+        </record>
+
+        <record model="ir.ui.view" id="ats_export_result_view_form">
+            <field name="model">nodux_account_ats.ats.export.result</field>
+            <field name="type">form</field>
+            <field name="name">ats_export_result_form</field>
+        </record>
+
+        <record model="ir.action.wizard" id="act_ats_export">
+            <field name="name">Export ATS</field>
+            <field name="wiz_name">nodux_account_ats.ats.export</field>
+        </record>
+        <menuitem name="Export ATS"
+            parent="account.menu_reporting"
+            action="act_ats_export"
+            id="menu_export_ats"
+            sequence="40"/>
+            
+    </data>
+</tryton>

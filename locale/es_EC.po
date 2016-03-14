@@ -2,238 +2,184 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:party.party:"
-msgid "Invalid VAT Number \"%s\"."
-msgstr "Número \"%s\" no es válido."
+msgctxt "field:account.invoice,formas_de_pago:"
+msgid "Formas de Pago"
+msgstr ""
 
-msgctxt "error:party.party:"
-msgid "VAT Number already exists!"
-msgstr "¡Número de Céd./RUC ya existe!"
+msgctxt "field:account.invoice,impuesto_ats_iva:"
+msgid "Impuesto IVA ATS"
+msgstr ""
 
-msgctxt "error:product.template:"
-msgid "NAME Product already exists"
-msgstr "¡Nombre de producto ya existe!"
+msgctxt "field:account.invoice,impuestos_ats_renta:"
+msgid "Impuesto Renta ATS"
+msgstr ""
 
-#, fuzzy
-msgctxt "field:account.invoice.force_draw.start,id:"
+msgctxt "field:account.invoice,numero_autorizacion:"
+msgid "Número de autorización"
+msgstr ""
+
+msgctxt "field:nodux_account_ats.ats.export.result,file:"
+msgid "File"
+msgstr "Archivo"
+
+msgctxt "field:nodux_account_ats.ats.export.result,id:"
 msgid "ID"
 msgstr "ID"
+
+msgctxt "field:nodux_account_ats.print_ats.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Año Fiscal"
+
+msgctxt "field:nodux_account_ats.print_ats.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:nodux_account_ats.print_ats.start,periodo:"
+msgid "Period"
+msgstr "Periodo"
+
+msgctxt "field:party.party,convenio_doble:"
+msgid "Convenio de doble Tributacion"
+msgstr ""
+
+msgctxt "field:party.party,pago_regimen:"
+msgid "Pago  es a un regimen fiscal preferente o de menor imposicion"
+msgstr "Pago  es a un regimen fiscal preferente o de menor imposición"
+
+msgctxt "field:party.party,parte_relacional:"
+msgid "Parte Relacional"
+msgstr ""
+
+msgctxt "field:party.party,sujeto_retencion:"
+msgid "Pago al exterior sujeto a retencion en aplicacion a la norma legal"
+msgstr "Pago al exterior sujeto a retención"
+
+msgctxt "field:party.party,tipo_de_pago:"
+msgid "Pago realizado a"
+msgstr ""
 
 msgctxt "field:party.party,type_document:"
 msgid "Type Document"
 msgstr "Tipo de documento"
 
-msgctxt "field:party.party,type_party:"
-msgid "Type Party"
-msgstr "Tipo de Tercero"
-
-msgctxt "model:account.invoice.force_draw.start,name:"
-msgid "Invoice Force Draw"
-msgstr "Forzar factura a borrador"
-
-msgctxt "model:ir.action,name:act_force_invoice_draw"
-msgid "Invoice Force Draw"
-msgstr "Forzar factura a borrador"
-
-#, fuzzy
-msgctxt "model:ir.action,name:report_balance_sheet"
-msgid "Balance Sheet"
-msgstr "Estado de Situación Financiera"
-
-#, fuzzy
-msgctxt "model:ir.action,name:report_income_statement"
-msgid "Income Statement"
-msgstr "Estado del Resultado Integral"
-
-#, fuzzy
-msgctxt "odt:account.balance_sheet:"
-msgid "$"
-msgstr "$"
-
-#, fuzzy
-msgctxt "odt:account.balance_sheet:"
-msgid "("
-msgstr "("
-
-#, fuzzy
-msgctxt "odt:account.balance_sheet:"
-msgid ")"
-msgstr ")"
-
-#, fuzzy
-msgctxt "odt:account.balance_sheet:"
-msgid "/"
-msgstr "/"
-
-msgctxt "odt:account.balance_sheet:"
-msgid "5"
-msgstr "6"
-
-msgctxt "odt:account.balance_sheet:"
-msgid "6"
+msgctxt "field:party.party,type_sustent:"
+msgid "Tipo de Sustento"
 msgstr ""
 
-#, fuzzy
-msgctxt "odt:account.balance_sheet:"
-msgid ":"
-msgstr ":"
-
-msgctxt "odt:account.balance_sheet:"
-msgid "A"
+msgctxt "help:account.invoice,formas_de_pago:"
+msgid "Seleccionar una forma de pago, cuando monto a pagar sea mayor a $1000"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "A LA"
+msgctxt "model:ir.action,name:act_ats_export"
+msgid "Export ATS"
+msgstr "Generar ATS"
+
+msgctxt "model:ir.ui.menu,name:menu_export_ats"
+msgid "Export ATS"
+msgstr "Exportar anexo transaccional simplificado (ATS)"
+
+msgctxt "model:nodux_account_ats.ats.export.result,name:"
+msgid "Export translation"
+msgstr "Exportar traducción - archivo"
+
+msgctxt "model:nodux_account_ats.print_ats.start,name:"
+msgid "Print ATS"
+msgstr "Imprimir ATS"
+
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "CHEQUE CERTIFICADO"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "AÑO 201"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "CHEQUE DE GERENCIA"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "COMPAÑI"
-msgstr "EMPRES"
-
-#, fuzzy
-msgctxt "odt:account.balance_sheet:"
-msgid "ESTADO DE SITUACION FINANCIERA"
-msgstr "ESTADO DE SITUACION FINANCIERA"
-
-msgctxt "odt:account.balance_sheet:"
-msgid "FECHA"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "CHEQUE DEL EXTERIOR"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "FECHA DE IMPRESIÓN:"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "CHEQUE PROPIO"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "NOLOGIE"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "COMPENSACIÓN DE DEUDAS"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "NOTAS"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "DEPÓSITO EN CUENTA (CORRIENTE/AHORROS)"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "O 201"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "DÉBITO DE CUENTA"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "PRESIK TECH"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "ENDOSO DE INVERSIÓN"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "S"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "GIRO"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "TRYTON ERP"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "SIN UTILIZACIÓN DEL SISTEMA FINANCIERO"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "[ PAG."
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "TARJETA DE CRÉDITO INTERNACIONAL"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "]"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "TARJETA DE CRÉDITO NACIONAL"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "|"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "TRANSFERENCIA  BANCO EXTERIOR"
 msgstr ""
 
-msgctxt "odt:account.balance_sheet:"
-msgid "Ñ"
+msgctxt "selection:account.invoice,formas_de_pago:"
+msgid "TRANSFERENCIA PROPIO BANCO"
 msgstr ""
 
-#, fuzzy
-msgctxt "odt:account.income_statement:"
-msgid "$"
-msgstr "$"
-
-#, fuzzy
-msgctxt "odt:account.income_statement:"
-msgid "("
-msgstr "("
-
-#, fuzzy
-msgctxt "odt:account.income_statement:"
-msgid ")"
-msgstr ")"
-
-#, fuzzy
-msgctxt "odt:account.income_statement:"
-msgid "/"
-msgstr "/"
-
-#, fuzzy
-msgctxt "odt:account.income_statement:"
-msgid ":"
-msgstr ":"
-
-msgctxt "odt:account.income_statement:"
-msgid "ANALISIS"
+msgctxt "selection:party.party,convenio_doble:"
+msgid "No"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "COMPAÑIA"
-msgstr "EMPRESA"
-
-msgctxt "odt:account.income_statement:"
-msgid "DESCRIPCION"
+msgctxt "selection:party.party,convenio_doble:"
+msgid "Si"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "ESTADO DE RESULTADO"
-msgstr "ESTADO DEL RESULTADO INTEGRAL"
-
-msgctxt "odt:account.income_statement:"
-msgid "FECHA DE IMPRESIÓN:"
+msgctxt "selection:party.party,pago_regimen:"
+msgid "No"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "INTEGRAL"
+msgctxt "selection:party.party,pago_regimen:"
+msgid "Si"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "NOLOGIE"
+msgctxt "selection:party.party,parte_relacional:"
+msgid "No"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "PERIODO FINAL"
+msgctxt "selection:party.party,parte_relacional:"
+msgid "Si"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "PERIODO INICIAL"
+msgctxt "selection:party.party,sujeto_retencion:"
+msgid "No"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "PRESIK TECH"
+msgctxt "selection:party.party,sujeto_retencion:"
+msgid "Si"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "S"
+msgctxt "selection:party.party,tipo_de_pago:"
+msgid "No residente"
 msgstr ""
 
-msgctxt "odt:account.income_statement:"
-msgid "TRYTON ERP"
-msgstr ""
-
-msgctxt "odt:account.income_statement:"
-msgid "VERTICAL"
-msgstr ""
-
-msgctxt "odt:account.income_statement:"
-msgid "[ PAG."
-msgstr ""
-
-msgctxt "odt:account.income_statement:"
-msgid "]"
-msgstr ""
-
-msgctxt "odt:account.income_statement:"
-msgid "|"
+msgctxt "selection:party.party,tipo_de_pago:"
+msgid "Residente"
 msgstr ""
 
 msgctxt "selection:party.party,type_document:"
@@ -242,36 +188,108 @@ msgstr ""
 
 msgctxt "selection:party.party,type_document:"
 msgid "Cedula"
-msgstr ""
+msgstr "Cédula"
 
 msgctxt "selection:party.party,type_document:"
 msgid "Consumidor Final"
-msgstr ""
+msgstr "Consumidor final"
 
 msgctxt "selection:party.party,type_document:"
 msgid "Pasaporte"
-msgstr ""
+msgstr "Pasaporte"
 
 msgctxt "selection:party.party,type_document:"
 msgid "RUC"
+msgstr "RUC"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid "Activo Fijo - Costo o Gasto para declaracion de IR"
+msgstr "Activo Fijo - Costo o Gasto para declaración de IR"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid "Activo Fijo - Credito Tributario para declaracion de IVA"
+msgstr "Activo Fijo - Crédito Tributario para declaracion de IVA"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid "Casos especiales cuyo sustento no aplica en las opciones anteriores"
 msgstr ""
 
-msgctxt "selection:party.party,type_party:"
+msgctxt "selection:party.party,type_sustent:"
+msgid "Convenios de debito o recaudacion para IFIs"
+msgstr "Convenios de débito o recaudación para IFIs"
+
+msgctxt "selection:party.party,type_sustent:"
 msgid ""
+"Costo o Gasto para declaracion de IR (servicios y bienes distintos de "
+"inventarios y activos fijos)"
+msgstr ""
+"Costo o Gasto para declaración de IR (servicios y bienes distintos de "
+"inventarios y activos fijos)"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid ""
+"Credito Tributario para declaracion de IVA (servicios y bienes distintos de "
+"inventarios y activos fijos)"
+msgstr ""
+"Crédito Tributario para declaración de IVA (servicios y bienes distintos de "
+"inventarios y activos fijos)"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid "Distribucion de Dividendos, Beneficios o Utilidades"
 msgstr ""
 
-msgctxt "selection:party.party,type_party:"
-msgid "Entidad Publica"
+msgctxt "selection:party.party,type_sustent:"
+msgid "Impuestos y retenciones presuntivos"
 msgstr ""
 
-msgctxt "selection:party.party,type_party:"
-msgid "Persona Juridica"
+msgctxt "selection:party.party,type_sustent:"
+msgid "Inventario - Costo o Gasto para declaracion de IR"
+msgstr "Inventario - Costo o Gasto para declaración de IR"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid "Inventario - Credito Tributario para declaracion de IVA"
+msgstr "Inventario - Crédito Tributario para declaración de IVA"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid ""
+"Liquidacion Gastos de Viaje, hospedaje y alimentacion Gastos IR (a nombre de"
+" empleados y no de la empresa)"
+msgstr ""
+"Liquidación Gastos de Viaje, hospedaje y alimentación Gastos IR (a nombre de"
+" empleados y no de la empresa)"
+
+msgctxt "selection:party.party,type_sustent:"
+msgid "Reembolso por Siniestros"
 msgstr ""
 
-msgctxt "selection:party.party,type_party:"
-msgid "Persona Natural"
+msgctxt "selection:party.party,type_sustent:"
+msgid "Valor pagado para solicitar Reembolso de Gasto (intermediario)"
 msgstr ""
 
-msgctxt "selection:party.party,type_party:"
-msgid "Sociedad"
+msgctxt "selection:party.party,type_sustent:"
+msgid ""
+"Valores reconocidos por entidades del sector publico a favor de sujetos "
+"pasivos"
 msgstr ""
+"Valores reconocidos por entidades del sector público a favor de sujetos "
+"pasivos"
+
+msgctxt "view:nodux_account_ats.ats.export.result:"
+msgid "Export ATS"
+msgstr "Generar ATS"
+
+msgctxt "view:nodux_account_ats.print_ats.start:"
+msgid "Export ATS"
+msgstr "Generar ATS"
+
+msgctxt "wizard_button:nodux_account_ats.ats.export,result,end:"
+msgid "Close"
+msgstr "Cerrar"
+
+msgctxt "wizard_button:nodux_account_ats.ats.export,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:nodux_account_ats.ats.export,start,export:"
+msgid "Export"
+msgstr "Generar"
