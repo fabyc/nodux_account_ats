@@ -4,7 +4,7 @@ msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "field:account.invoice,fecha_autorizacion:"
 msgid "Fecha de autorizacion"
-msgstr ""
+msgstr "Fecha de autorización"
 
 msgctxt "field:account.invoice,formas_de_pago:"
 msgid "Formas de Pago"
@@ -24,7 +24,7 @@ msgstr "Número de autorización"
 
 msgctxt "field:account.invoice,numero_factura:"
 msgid "Numero de factura"
-msgstr ""
+msgstr "Número de factura"
 
 msgctxt "field:nodux_account_ats.ats.export.result,file:"
 msgid "File"
@@ -36,7 +36,7 @@ msgstr "ID"
 
 msgctxt "field:nodux_account_ats.print_ats.start,fiscalyear:"
 msgid "Fiscal Year"
-msgstr "Año Fiscal"
+msgstr "Año fiscal"
 
 msgctxt "field:nodux_account_ats.print_ats.start,id:"
 msgid "ID"
@@ -48,19 +48,19 @@ msgstr "Período"
 
 msgctxt "field:party.party,convenio_doble:"
 msgid "Convenio de doble Tributacion"
-msgstr "Convenio de doble tributación"
+msgstr "Convenio de doble Tributación"
 
 msgctxt "field:party.party,impuesto_ats_iva:"
 msgid "Impuesto IVA ATS"
-msgstr ""
+msgstr "Impuesto IVA ATS"
 
 msgctxt "field:party.party,impuestos_ats_renta:"
 msgid "Impuesto Renta ATS"
-msgstr ""
+msgstr "Impuesto Renta ATS"
 
 msgctxt "field:party.party,pago_regimen:"
 msgid "Pago  es a un regimen fiscal"
-msgstr "Pago es a un regimen fiscal preferente o de menor imposición"
+msgstr "Pago es a un regimen fiscal"
 
 msgctxt "field:party.party,parte_relacional:"
 msgid "Parte Relacional"
@@ -76,7 +76,7 @@ msgstr "Pago realizado a"
 
 msgctxt "field:party.party,tipo_proveedor:"
 msgid "Identificacion del Proveedor"
-msgstr ""
+msgstr "Identificación del Proveedor"
 
 msgctxt "field:party.party,type_document:"
 msgid "Type Document"
@@ -93,15 +93,15 @@ msgstr ""
 
 msgctxt "help:party.party,pago_regimen:"
 msgid "Pago es a un regimen fiscal preferente o de menor imposicion"
-msgstr ""
+msgstr "Pago es a un regimen fiscal preferente o de menor imposición"
 
 msgctxt "help:party.party,sujeto_retencion:"
 msgid "Pago al exterior sujeto a retencion en aplicacion a la norma legal"
-msgstr ""
+msgstr "Pago al exterior sujeto a retención en aplicación a la norma legal"
 
 msgctxt "help:party.party,tipo_proveedor:"
 msgid "Tipo de identificacion del Proveedor"
-msgstr ""
+msgstr "Tipo de identificación del proveedor"
 
 msgctxt "model:ir.action,name:act_ats_export"
 msgid "Export ATS"
@@ -125,11 +125,11 @@ msgstr ""
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "01-SIN UTILIZACIÓN DEL SISTEMA FINANCIERO"
-msgstr ""
+msgstr "01-SIN UTILIZACIÓN DEL SISTEMA FINANCIERO"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "02-CHEQUE PROPIO"
-msgstr ""
+msgstr "02-CHEQUE PROPIO"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "03-CHEQUE CERTIFICADO"
@@ -137,47 +137,47 @@ msgstr "03-CHEQUE CERTIFICADO"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "04-CHEQUE DE GERENCIA"
-msgstr ""
+msgstr "04-CHEQUE DE GERENCIA"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "05-CHEQUE DEL EXTERIOR"
-msgstr ""
+msgstr "05-CHEQUE DEL EXTERIOR"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "06-DÉBITO DE CUENTA"
-msgstr ""
+msgstr "06-DÉBITO DE CUENTA"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "07-TRANSFERENCIA PROPIO BANCO"
-msgstr ""
+msgstr "07-TRANSFERENCIA PROPIO BANCO"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "08-TRANSFERENCIA OTRO BANCO NACIONAL"
-msgstr ""
+msgstr "08-TRANSFERENCIA OTRO BANCO NACIONAL"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "09-TRANSFERENCIA  BANCO EXTERIOR"
-msgstr "09-TRANSFERENCIA  BANCO EXTERIOR"
+msgstr "09-TRANSFERENCIA BANCO EXTERIOR"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "10-TARJETA DE CRÉDITO NACIONAL"
-msgstr ""
+msgstr "10-TARJETA DE CRÉDITO NACIONAL"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "11-TARJETA DE CRÉDITO INTERNACIONAL"
-msgstr ""
+msgstr "11-TARJETA DE CRÉDITO INTERNACIONAL"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "12-GIRO"
-msgstr ""
+msgstr "12-GIRO"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "13-DEPÓSITO EN CUENTA (CORRIENTE/AHORROS)"
-msgstr ""
+msgstr "13-DEPÓSITO EN CUENTA (CORRIENTE/AHORROS)"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "14-ENDOSO DE INVERSIÓN"
-msgstr ""
+msgstr "14-ENDOSO DE INVERSIÓN"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "15-COMPENSACIÓN DE DEUDAS"
@@ -193,7 +193,7 @@ msgstr "CHEQUE DE GERENCIA"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "CHEQUE DEL EXTERIOR"
-msgstr "CHEQUE DE GERENCIA"
+msgstr "CHEQUE DEL EXTERIOR"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "CHEQUE PROPIO"
@@ -213,7 +213,7 @@ msgstr "DÉBITO DE CUENTA"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "ENDOSO DE INVERSIÓN"
-msgstr "DÉBITO DE CUENTA"
+msgstr "ENDOSO DE INVERSIÓN"
 
 msgctxt "selection:account.invoice,formas_de_pago:"
 msgid "GIRO"
@@ -305,11 +305,11 @@ msgstr ""
 
 msgctxt "selection:party.party,tipo_proveedor:"
 msgid "Persona Natural"
-msgstr ""
+msgstr "Persona Natural"
 
 msgctxt "selection:party.party,tipo_proveedor:"
 msgid "Sociedad"
-msgstr ""
+msgstr "Sociedad"
 
 msgctxt "selection:party.party,type_document:"
 msgid ""
@@ -338,36 +338,43 @@ msgstr ""
 msgctxt "selection:party.party,type_sustent:"
 msgid "00-Casos especiales cuyo sustento no aplica en las opciones anteriores"
 msgstr ""
+"00-Casos especiales cuyo sustento no aplica en las opciones anteriores"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid ""
 "01-Credito Tributario para declaracion de IVA (servicios y bienes distintos "
 "de inventarios y activos fijos)"
 msgstr ""
+"01-Credito Tributario para declaración de IVA (servicios y bienes distintos "
+"de inventarios y activos fijos)"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid ""
 "02-Costo o Gasto para declaracion de IR (servicios y bienes distintos de "
 "inventarios y activos fijos)"
 msgstr ""
+"02-Costo o Gasto para declaración de IR (servicios y bienes distintos de "
+"inventarios y activos fijos)"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "03-Activo Fijo - Credito Tributario para declaracion de IVA"
-msgstr ""
+msgstr "03-Activo Fijo - Crédito Tributario para declaración de IVA"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "04-Activo Fijo - Costo o Gasto para declaracion de IR"
-msgstr ""
+msgstr "04-Activo Fijo - Costo o Gasto para declaración de IR"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid ""
 "05-Liquidacion Gastos de Viaje, hospedaje y alimentacion Gastos IR (a nombre"
 " de empleados y no de la empresa)"
 msgstr ""
+"05-Liquidación Gastos de Viaje, hospedaje y alimentación Gastos IR (a nombre"
+" de empleados y no de la empresa)"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "06-Inventario - Credito Tributario para declaracion de IVA"
-msgstr "06-Inventario - Credito Tributario para declaracion de IVA"
+msgstr "06-Inventario - Credito Tributario para declaración de IVA"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "07-Inventario - Costo o Gasto para declaracion de IR"
@@ -375,7 +382,7 @@ msgstr "07-Inventario - Costo o Gasto para declaracion de IR"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "08-Valor pagado para solicitar Reembolso de Gasto (intermediario)"
-msgstr ""
+msgstr "08-Valor pagado para solicitar Reembolso de Gasto (intermediario)"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "09-Reembolso por Siniestros"
@@ -383,21 +390,23 @@ msgstr "09-Reembolso por Siniestros"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "10-Distribucion de Dividendos, Beneficios o Utilidades"
-msgstr ""
+msgstr "10-Distribución de Dividendos, Beneficios o Utilidades"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "11-Convenios de debito o recaudacion para IFIs"
-msgstr ""
+msgstr "11-Convenios de débito o recaudación para IFIs"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "12-Impuestos y retenciones presuntivos"
-msgstr ""
+msgstr "12-Impuestos y retenciones presuntivos"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid ""
 "13-Valores reconocidos por entidades del sector publico a favor de sujetos "
 "pasivos"
 msgstr ""
+"13-Valores reconocidos por entidades del sector público a favor de sujetos "
+"pasivos"
 
 msgctxt "selection:party.party,type_sustent:"
 msgid "Activo Fijo - Costo o Gasto para declaracion de IR"
@@ -481,7 +490,7 @@ msgstr "Generar ATS"
 
 msgctxt "view:party.party:"
 msgid "ATS"
-msgstr ""
+msgstr "ATS"
 
 msgctxt "wizard_button:nodux_account_ats.ats.export,result,end:"
 msgid "Close"
