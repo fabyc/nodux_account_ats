@@ -69,9 +69,4 @@ class Party:
     def default_tipo_de_pago():
         return '01'
 
-    @staticmethod
-    def default_convenio_doble():
-        return 'NO'
-        
-    
 
