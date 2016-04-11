@@ -3,6 +3,13 @@
     <xpath expr="/form/notebook/page[@id='invoice']/field[@name='currency']" position="after">
         <label name="formas_de_pago"/>
         <field name="formas_de_pago"/>
+        <label name="numero_autorizacion"/>
+        <field name="numero_autorizacion"/>
+        <newline/>
+        <label name="fecha_autorizacion"/>
+        <field name="fecha_autorizacion"/>
+        <label name="numero_factura"/>
+        <field name="numero_factura"/>
     </xpath>   
 </data>
 

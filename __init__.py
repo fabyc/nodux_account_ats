@@ -11,6 +11,7 @@ def register():
         ATSExportResult,
         Party,
         Invoice,
+        SustentoComprobante,
         module='nodux_account_ats', type_='model')
     Pool.register(
         ATSExport,

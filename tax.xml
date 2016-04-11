@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="ir.ui.view" id="sustento_view_tree">
+            <field name="model">account.sustento</field>
+            <field name="type">tree</field>
+            <field name="name">sustento_tree</field>
+        </record>
+
+        <record model="ir.ui.view" id="sustento_view_form">
+            <field name="model">account.sustento</field>
+            <field name="type">form</field>
+            <field name="name">sustento_form</field>
+        </record>
+        
+        <record model="ir.action.act_window" id="act_sustento_form">
+            <field name="name">Sustento del comprobante ATS</field>
+            <field name="res_model">account.sustento</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_sustento_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="sustento_view_tree"/>
+            <field name="act_window" ref="act_sustento_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_sustento_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="sustento_view_form"/>
+            <field name="act_window" ref="act_sustento_form"/>
+        </record>
+        <menuitem parent="account.menu_taxes" action="act_sustento_form"
+            id="menu_sustento_form"/>
+            
+    </data>
+</tryton>

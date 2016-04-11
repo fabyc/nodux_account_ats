@@ -24,7 +24,7 @@ import smtplib, os
 from cStringIO import StringIO as StringIO
 import base64
 
-__all__ = ['ATSStart','ATSExportResult', 'ATSExport']
+__all__ = ['ATSStart','ATSExportResult', 'ATSExport', 'SustentoComprobante']
          
 __metaclass__ = PoolMeta
 
@@ -32,6 +32,7 @@ tipoIdentificacion = {
     '04' : '01',
     '05' : '02',
     '06' : '03',
+    '07' : '01'
 }
 
 identificacionCliente = {
@@ -46,6 +47,7 @@ tipoDocumento = {
     'out_debit_note': '05',
     'out_shipment': '06',
     'in_withholding': '07',
+    'in_invoice': '01',
 }
 
 tpIdCliente = {
@@ -59,6 +61,29 @@ tipoProvedor = {
     'sociedad': '02',
 }
 
+class SustentoComprobante(ModelSQL, ModelView):
+    'Sustento Comprobante'
+    __name__ = 'account.sustento'
+    name = fields.Char('Tipo de sustento', size=None, required=True, translate=True)
+    code = fields.Char('Codigo', size=None, required=True)
+    
+    @classmethod
+    def __setup__(cls):
+        super(SustentoComprobante, cls).__setup__()
+        
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return ['OR',
+            ('code',) + tuple(clause[1:]),
+            (cls._rec_name,) + tuple(clause[1:]),
+            ]
+            
+    def get_rec_name(self, name):
+        if self.code:
+            return self.code + ' - ' + self.name
+        else:
+            return self.name
+            
 class ATSStart(ModelView):
     'Print ATS'
     __name__ = 'nodux_account_ats.print_ats.start'
@@ -68,7 +93,6 @@ class ATSStart(ModelView):
         domain=[('fiscalyear', '=', Eval('fiscalyear'))], required = True )
         
     def get_ventas(self):
-        print "LLEga **"
         pool = Pool()
         Invoice = pool.get('account.invoice')
         MoveLine = pool.get('account.move.line')
@@ -104,6 +128,7 @@ class ATSStart(ModelView):
         Journal = pool.get('account.journal')
         Period = pool.get('account.period')
         company = Company.search([('id', '=', Transaction().context.get('company'))])
+        
         print "Empresa ", company
         for c in company:
             id_informante = c.party.vat_number
@@ -125,18 +150,19 @@ class ATSStart(ModelView):
         for inv in invoices:
             detallecompras = etree.Element('detalleCompras')
             #pendiente codigo de sustento
-            etree.SubElement(detallecompras, 'codSustento').text = cls.party.type_sustent
-            etree.SubElement(detallecompras, 'tpIdProv').text = tipoIdentificacion[cls.party.type_document]
-            etree.SubElement(detallecompras, 'idProv').text = cls.party.vat_number
-            etree.SubElement(detallecompras, 'tipoComprobante').text = tipoDocumento[cls.type]
-            if tipoIdentificacion[cls.party.type_document] == '03':
-                etree.SubElement(detallecompras, 'tipoProv').text = tipoProvedor[cls.party.type_party]
-            etree.SubElement(detallecompras, 'parteRelVtas').text = cls.party.parte_relacional
-            etree.SubElement(detallecompras, 'fechaRegistro').text = time.strftime(inv.date_invoice, '%d/%m/%Y')
+            etree.SubElement(detallecompras, 'codSustento').text = inv.party.type_sustent
+            print "El tipo del tercero es ",inv.party.type_document
+            etree.SubElement(detallecompras, 'tpIdProv').text = tipoIdentificacion[inv.party.type_document]
+            etree.SubElement(detallecompras, 'idProv').text = inv.party.vat_number
+            etree.SubElement(detallecompras, 'tipoComprobante').text = tipoDocumento[inv.type]
+            if tipoIdentificacion[inv.party.type_document] == '06':
+                etree.SubElement(detallecompras, 'tipoProv').text = inv.tipo_proveedor
+            etree.SubElement(detallecompras, 'parteRelVtas').text = inv.party.parte_relacional
+            etree.SubElement(detallecompras, 'fechaRegistro').text = time.strftime(inv.invoice_date, '%d/%m/%Y')
             etree.SubElement(detallecompras, 'establecimiento').text = '001'
             etree.SubElement(detallecompras, 'puntoEmision').text = '001'
             etree.SubElement(detallecompras, 'secuencial').text = inv.number
-            etree.SubElement(detallecompras, 'fechaEmision').text = time.strftime(inv.date_invoice, '%d/%m/%Y')
+            etree.SubElement(detallecompras, 'fechaEmision').text = time.strftime(inv.invoice_date, '%d/%m/%Y')
             etree.SubElement(detallecompras, 'autorizacion').text = inv.numero_autorizacion
             etree.SubElement(detallecompras, 'baseNoGraIva').text = '001' #corregir
             etree.SubElement(detallecompras, 'baseImponible').text = '001' #corregir
@@ -148,7 +174,7 @@ class ATSStart(ModelView):
             etree.SubElement(detallecompras, 'valorRetServicios').text = '000', #corregir'%.2f'
             etree.SubElement(detallecompras, 'valRetServ100').text = '000', #corregir'%.2f'
             pagoExterior = etree.Element('pagoExterior')
-            etree.SubElement(pagoExterior, 'pagoLocExt').text = cls.party.tipo_de_pago
+            etree.SubElement(pagoExterior, 'pagoLocExt').text = inv.party.tipo_de_pago
             if cls.party.tipo_de_pago == '02':
                 if cls.party.address.country.code == 'GW':
                     codigo_pais = 437
