@@ -2,25 +2,28 @@
 <!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
 this repository contains the full copyright notices and license terms. -->
 <data>
-    <xpath
-        expr="/form/notebook/page[@id='general']/field[@name='contact_mechanisms']"
-        position="before">
-        <group col="2" colspan="4" id="ats">
+    <xpath expr="/form/notebook/page[@id='accounting']" position="after">
+        <page string="ATS" id="ats">
+            <separator string = "ATS" id="ats"/>
+            <newline/>
             <label name="type_sustent"/>
-            <field name="type_sustent"/>
+            <field name="type_sustent" xexpand="0"/>
+            <newline/>
             <label name="parte_relacional"/>
-            <field name="parte_relacional"/>
+            <field name="parte_relacional" xexpand="0"/>
             <newline/>
             <label name="tipo_de_pago"/>
-            <field name="tipo_de_pago"/>
+            <field name="tipo_de_pago" xexpand="0"/>
+            <newline/>
             <label name="convenio_doble"/>
-            <field name="convenio_doble"/>
+            <field name="convenio_doble" xexpand="0"/>
             <newline/>
             <label name="sujeto_retencion"/>
-            <field name="sujeto_retencion"/>
+            <field name="sujeto_retencion" xexpand="0"/>
+            <newline/>
             <label name="pago_regimen"/>
-            <field name="pago_regimen"/>
-        </group>
-            
+            <field name="pago_regimen" xexpand="0"/>
+            <newline/>
+        </page>
     </xpath>
 </data>
