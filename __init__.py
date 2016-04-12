@@ -7,11 +7,11 @@ from .account import *
 from .invoice import *
 def register():
     Pool.register(
+        SustentoComprobante,
         ATSStart,
         ATSExportResult,
         Party,
         Invoice,
-        SustentoComprobante,
         module='nodux_account_ats', type_='model')
     Pool.register(
         ATSExport,
