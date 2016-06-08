@@ -24,7 +24,7 @@ import smtplib, os
 from cStringIO import StringIO as StringIO
 import base64
 
-__all__ = ['ATSStart','ATSExportResult', 'ATSExport', 'SustentoComprobante']
+__all__ = ['SustentoComprobante', 'ATSStart','ATSExportResult', 'ATSExport']
          
 __metaclass__ = PoolMeta
 

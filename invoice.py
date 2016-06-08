@@ -33,26 +33,19 @@ _FORMAS = [
 class Invoice():
 
     __name__ = 'account.invoice'
-    
+
     formas_de_pago = fields.Selection(_FORMAS, 'Formas de Pago', states={
             'invisible': Eval('type') != 'in_invoice',
             }, help = u'Seleccionar una forma de pago, cuando monto a pagar sea mayor a $1000')
-      
+
     numero_autorizacion = fields.Char(u'Número de autorización', size=49, states={
             'invisible': Eval('type') != 'in_invoice',
-            'required': Eval('type') == 'in_invoice',
             })
-            
+
     fecha_autorizacion = fields.Date(u'Fecha de autorizacion', states={
             'invisible': Eval('type') != 'in_invoice',
-            'required': Eval('type') == 'in_invoice',
-            })    
-    numero_factura = fields.Char(u'Numero de factura', states={
-            'invisible': Eval('type') != 'in_invoice',
-            'required': Eval('type') == 'in_invoice',
-            })   
-                 
+            })
+
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
-
