@@ -6,8 +6,8 @@ this repository contains the full copyright notices and license terms. -->
         <page string="ATS" id="ats">
             <separator string = "ATS" id="ats"/>
             <newline/>
-            <label name="type_sustent"/>
-            <field name="type_sustent" xexpand="0"/>
+            <label name="tipo_sustento"/>
+            <field name="tipo_sustento" xexpand="0"/>
             <newline/>
             <label name="parte_relacional"/>
             <field name="parte_relacional" xexpand="0"/>
