@@ -5,6 +5,6 @@ this repository contains the full copyright notices and license terms. -->
     <label name="fiscalyear"/>
     <field name="fiscalyear"/>
     <newline/>
-    <label name="fiscalyear"/>
+    <label name="periodo"/>
     <field name="periodo"/>
 </form>

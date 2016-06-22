@@ -3,27 +3,27 @@
 this repository contains the full copyright notices and license terms. -->
 <data>
     <xpath expr="/form/notebook/page[@id='accounting']" position="after">
-        <page string="ATS" id="ats">
+        <page string="ATS" id="ats" col="6">
             <separator string = "ATS" id="ats"/>
             <newline/>
             <label name="tipo_sustento"/>
-            <field name="tipo_sustento" xexpand="0"/>
+            <field name="tipo_sustento"/>
             <newline/>
             <label name="parte_relacional"/>
-            <field name="parte_relacional" xexpand="0"/>
-            <newline/>
+            <field name="parte_relacional" />
             <label name="tipo_de_pago"/>
-            <field name="tipo_de_pago" xexpand="0"/>
+            <field name="tipo_de_pago" />
+            <label name="sujeto_retencion"/>
+            <field name="sujeto_retencion" />
             <newline/>
             <label name="convenio_doble"/>
-            <field name="convenio_doble" xexpand="0"/>
-            <newline/>
-            <label name="sujeto_retencion"/>
-            <field name="sujeto_retencion" xexpand="0"/>
+            <field name="convenio_doble"/>
             <newline/>
             <label name="pago_regimen"/>
-            <field name="pago_regimen" xexpand="0"/>
+            <field name="pago_regimen"/>
             <newline/>
+            <label name="tipo_proveedor"/>
+            <field name="tipo_proveedor"/>
         </page>
     </xpath>
 </data>
