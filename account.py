@@ -24,7 +24,7 @@ import smtplib, os
 from cStringIO import StringIO as StringIO
 import base64
 
-__all__ = ['SustentoComprobante', 'ATSStart','ATSExportResult', 'ATSExport']
+__all__ = ['FormaPago','SustentoComprobante', 'ATSStart','ATSExportResult', 'ATSExport']
 
 __metaclass__ = PoolMeta
 
@@ -48,6 +48,7 @@ tipoDocumento = {
     'out_debit_note': '05',
     'out_shipment': '06',
     'in_withholding': '07',
+    'in_invoice': '01',
 }
 
 tpIdCliente = {
@@ -60,6 +61,29 @@ tipoProvedor = {
     'persona_natural' : '01',
     'sociedad': '02',
 }
+
+class FormaPago(ModelSQL, ModelView):
+    'Forma Pago'
+    __name__ = 'account.formas_pago'
+    name = fields.Char('Forma de pago', size=None, required=True, translate=True)
+    code = fields.Char('Codigo', size=None, required=True)
+
+    @classmethod
+    def __setup__(cls):
+        super(FormaPago, cls).__setup__()
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return ['OR',
+            ('code',) + tuple(clause[1:]),
+            (cls._rec_name,) + tuple(clause[1:]),
+            ]
+
+    def get_rec_name(self, name):
+        if self.code:
+            return self.code + ' - ' + self.name
+        else:
+            return self.name
 
 class SustentoComprobante(ModelSQL, ModelView):
     'Sustento Comprobante'

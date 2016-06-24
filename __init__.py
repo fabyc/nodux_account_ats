@@ -7,6 +7,7 @@ from .account import *
 from .invoice import *
 def register():
     Pool.register(
+        FormaPago,
         SustentoComprobante,
         ATSStart,
         ATSExportResult,
