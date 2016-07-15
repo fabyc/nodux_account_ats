@@ -8,5 +8,7 @@
         <newline/>
         <label name="forma_de_pago"/>
         <field name="forma_de_pago" xexpand="1"/>
+        <label name="exclude_ats"/>
+        <field name="exclude_ats"/>
     </xpath>
 </data>

@@ -31,6 +31,15 @@ class Invoice():
             'readonly' : Eval('state') != 'draft',
             })
 
+    exclude_ats = fields.Boolean('Not include in ATS', states={
+            'invisible': Eval('type') != 'in_invoice',
+            'readonly': Eval('state') != 'draft',
+            })
+
     @classmethod
     def __setup__(cls):
         super(Invoice, cls).__setup__()
+
+    @staticmethod
+    def default_exclude_ats():
+        return False
