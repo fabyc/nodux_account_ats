@@ -11,9 +11,7 @@ import time
 __all__ = ['Invoice']
 __metaclass__ = PoolMeta
 
-
 class Invoice():
-
     __name__ = 'account.invoice'
 
     forma_de_pago = fields.Many2One('account.formas_pago', 'Formas de Pago', states={

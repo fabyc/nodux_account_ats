@@ -3,28 +3,46 @@
 this repository contains the full copyright notices and license terms. -->
 <tryton>
     <data>
+
+        <record model="ir.ui.view" id="print_talon_start_view_form">
+          <field name="model">nodux_account_ats.print_talon.start</field>
+          <field name="type">form</field>
+          <field name="name">talon_start_form</field>
+        </record>
+        <record model="ir.action.wizard" id="wizard_talon">
+          <field name="name">Print ATS</field>
+          <field name="wiz_name">nodux_account_ats.print_talon</field>
+        </record>
+        <menuitem parent="account.menu_reporting" action="wizard_talon"
+            id="menu_talon" icon="tryton-print"/>
+
+        <record model="ir.action.report" id="report_talon">
+          <field name="name">Print ATS</field>
+          <field name="model"></field>
+          <field name="report_name">nodux_account_ats.talon</field>
+          <field name="report">nodux_account_ats/ats.odt</field>
+        </record>
         <!-- ATS-->
         <record model="ir.ui.view" id="print_ats_start_view_form">
-            <field name="model">nodux_account_ats.print_ats.start</field>
-            <field name="type">form</field>
-            <field name="name">ats_export_start_form</field>
+          <field name="model">nodux_account_ats.print_ats.start</field>
+          <field name="type">form</field>
+          <field name="name">ats_export_start_form</field>
         </record>
 
         <record model="ir.ui.view" id="ats_export_result_view_form">
-            <field name="model">nodux_account_ats.ats.export.result</field>
-            <field name="type">form</field>
-            <field name="name">ats_export_result_form</field>
+          <field name="model">nodux_account_ats.ats.export.result</field>
+          <field name="type">form</field>
+          <field name="name">ats_export_result_form</field>
         </record>
 
         <record model="ir.action.wizard" id="act_ats_export">
-            <field name="name">Export ATS</field>
-            <field name="wiz_name">nodux_account_ats.ats.export</field>
+          <field name="name">Export ATS</field>
+          <field name="wiz_name">nodux_account_ats.ats.export</field>
         </record>
         <menuitem name="Export ATS"
             parent="account.menu_reporting"
             action="act_ats_export"
             id="menu_export_ats"
             sequence="40"/>
-            
     </data>
 </tryton>

@@ -9,7 +9,7 @@ from collections import OrderedDict
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button, StateTransition, StateAction
 from trytond.report import Report
-from trytond.pyson import Eval, PYSONEncoder
+from trytond.pyson import Eval, PYSONEncoder, In
 from trytond.transaction import Transaction
 from trytond.pool import Pool, PoolMeta
 from trytond.modules.company import CompanyReport
@@ -23,8 +23,13 @@ import datetime
 import smtplib, os
 from cStringIO import StringIO as StringIO
 import base64
+import pytz
+from datetime import datetime,timedelta
+import time
 
-__all__ = ['FormaPago','SustentoComprobante', 'ATSStart','ATSExportResult', 'ATSExport']
+
+__all__ = ['SustentoComprobante', 'ATSStart','ATSExportResult', 'ATSExport',
+            'PrintTalonStart', 'PrintTalon', 'ReportTalon']
 
 __metaclass__ = PoolMeta
 
@@ -62,29 +67,6 @@ tipoProvedor = {
     'sociedad': '02',
 }
 
-class FormaPago(ModelSQL, ModelView):
-    'Forma Pago'
-    __name__ = 'account.formas_pago'
-    name = fields.Char('Forma de pago', size=None, required=True, translate=True)
-    code = fields.Char('Codigo', size=None, required=True)
-
-    @classmethod
-    def __setup__(cls):
-        super(FormaPago, cls).__setup__()
-
-    @classmethod
-    def search_rec_name(cls, name, clause):
-        return ['OR',
-            ('code',) + tuple(clause[1:]),
-            (cls._rec_name,) + tuple(clause[1:]),
-            ]
-
-    def get_rec_name(self, name):
-        if self.code:
-            return self.code + ' - ' + self.name
-        else:
-            return self.name
-
 class SustentoComprobante(ModelSQL, ModelView):
     'Sustento Comprobante'
     __name__ = 'account.sustento'
@@ -117,7 +99,6 @@ class ATSStart(ModelView):
         domain=[('fiscalyear', '=', Eval('fiscalyear'))], required = True )
 
     def get_ventas(self):
-        print "LLEga **"
         pool = Pool()
         Invoice = pool.get('account.invoice')
         MoveLine = pool.get('account.move.line')
@@ -202,18 +183,18 @@ class ATSStart(ModelView):
         for inv in invoices:
             detallecompras = etree.Element('detalleCompras')
             #pendiente codigo de sustento
-            etree.SubElement(detallecompras, 'codSustento').text = cls.party.type_sustent
-            etree.SubElement(detallecompras, 'tpIdProv').text = tipoIdentificacion[cls.party.type_document]
-            etree.SubElement(detallecompras, 'idProv').text = cls.party.vat_number
-            etree.SubElement(detallecompras, 'tipoComprobante').text = tipoDocumento[cls.type]
-            if tipoIdentificacion[cls.party.type_document] == '03':
-                etree.SubElement(detallecompras, 'tipoProv').text = tipoProvedor[cls.party.type_party]
-            etree.SubElement(detallecompras, 'parteRelVtas').text = cls.party.parte_relacional
-            etree.SubElement(detallecompras, 'fechaRegistro').text = time.strftime(inv.date_invoice, '%d/%m/%Y')
+            etree.SubElement(detallecompras, 'codSustento').text = inv.party.tipo_sustento.code
+            etree.SubElement(detallecompras, 'tpIdProv').text = tipoIdentificacion[inv.party.type_document]
+            etree.SubElement(detallecompras, 'idProv').text = inv.party.vat_number
+            etree.SubElement(detallecompras, 'tipoComprobante').text = tipoDocumento[inv.type]
+            if tipoIdentificacion[inv.party.type_document] == '03':
+                etree.SubElement(detallecompras, 'tipoProv').text = tipoProvedor[inv.party.type_party]
+            etree.SubElement(detallecompras, 'parteRelVtas').text = inv.party.parte_relacional
+            etree.SubElement(detallecompras, 'fechaRegistro').text = inv.invoice_date.strftime('%d/%m/%Y')
             etree.SubElement(detallecompras, 'establecimiento').text = '001'
             etree.SubElement(detallecompras, 'puntoEmision').text = '001'
             etree.SubElement(detallecompras, 'secuencial').text = inv.number
-            etree.SubElement(detallecompras, 'fechaEmision').text = time.strftime(inv.date_invoice, '%d/%m/%Y')
+            etree.SubElement(detallecompras, 'fechaEmision').text = inv.invoice_date.strftime('%d/%m/%Y')
             etree.SubElement(detallecompras, 'autorizacion').text = inv.numero_autorizacion
             etree.SubElement(detallecompras, 'baseNoGraIva').text = '001' #corregir
             etree.SubElement(detallecompras, 'baseImponible').text = '001' #corregir
@@ -222,43 +203,54 @@ class ATSStart(ModelView):
             etree.SubElement(detallecompras, 'montoIva').text = '%.2f'%inv.tax_amount
             etree.SubElement(detallecompras, 'valorRetBienes').text = '%.2f'%abs(inv.tax_amount)
 
-            etree.SubElement(detallecompras, 'valorRetServicios').text = '000', #corregir'%.2f'
-            etree.SubElement(detallecompras, 'valRetServ100').text = '000', #corregir'%.2f'
+            etree.SubElement(detallecompras, 'valorRetServicios').text = '000' #corregir'%.2f'
+            etree.SubElement(detallecompras, 'valRetServ100').text = '000' #corregir'%.2f'
             pagoExterior = etree.Element('pagoExterior')
-            etree.SubElement(pagoExterior, 'pagoLocExt').text = cls.party.tipo_de_pago
+            etree.SubElement(pagoExterior, 'pagoLocExt').text = inv.party.tipo_de_pago
 
-            etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = cls.party.convenio_doble
-            etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = cls.party.sujeto_retencion
-            etree.SubElement(pagoExterior, 'pagoRegFis').text = cls.party.pago_regimen
+            etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = inv.party.convenio_doble
+            etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = inv.party.sujeto_retencion
+            etree.SubElement(pagoExterior, 'pagoRegFis').text = inv.party.pago_regimen
             detallecompras.append(pagoExterior)
-            if formas_de_pago:
+            """
+            if inv.formas_de_pago:
                 formasDePago = etree.Element('formasDePago')
                 etree.SubElement(formasDePago, 'formaPago').text = inv.formas_de_pago
                 detallecompras.append(formasDePago)
+            """
+            withholding = None
+            if inv.ref_withholding:
+                Withholding = pool.get('account.withholding')
+                withholdings = Withholding.search([('number', '=', inv.ref_withholding)])
+                for w in withholdings:
+                    withholding = w
 
             air = etree.Element('air')
             detalleAir = etree.Element('detalleAir')
-            etree.SubElement(detalleAir, 'codRetAir').text = inv.impuestos_ats_renta.code
-            etree.SubElement(detalleAir, 'baseImpAir').text = '{:.2f}'.format(inv.untaxed_amount)
-            etree.SubElement(detalleAir, 'porcentajeAir').text = inv.impuestos_ats_renta.rate
-            etree.SubElement(detalleAir, 'valRetAir').text = '{:.2f}'.format((inv.impuestos_ats_renta.rate)*(inv.untaxed_amount))
-            if inv.impuestos_ats_renta.code == '345' | inv.impuestos_ats_renta.code == '345A' | inv.impuestos_ats_renta.code ==  '346':
-                etree.SubElement(detalleAir, 'fechaPagoDiv').text = inv.invoice_date.strftime('%d/%m/%Y')
-            if inv.impuestos_ats_renta.code == '327' | inv.impuestos_ats_renta.code=='330' | inv.impuestos_ats_renta.code=='504' | inv.impuestos_ats_renta.code=='504D':
-                etree.SubElement(detalleAir, 'imRentaSoc').text = '000' #pendiente
-                etree.SubElement(detalleAir, 'anioUtDiv').text = '000' #pendiente
-            air.append(detalleAir)
-            detallecompras.append(air)
-            etree.SubElement(detallecompras, 'estabRetencion1').text = '000' #pendiente
-            etree.SubElement(detallecompras, 'ptoEmiRetencion1').text = '000' #pendiente
-            etree.SubElement(detallecompras, 'secRetencion1').text = '000' #pendiente
-            etree.SubElement(detallecompras, 'autRetencion1').text = '000' #pendiente
-            etree.SubElement(detallecompras, 'fechaEmiRet1').text = '000' #pendiente
-            etree.SubElement(detallecompras, 'docModificado').text = '0'
-            etree.SubElement(detallecompras, 'estabModificado').text = '000'
-            etree.SubElement(detallecompras, 'ptoEmiModificado').text = '000'
-            etree.SubElement(detallecompras, 'secModificado').text = '0'
-            etree.SubElement(detallecompras, 'autModificado').text = '0000'
+            if withholding != None:
+                for tax in withholding.taxes:
+                    if tax.tipo == 'RENTA':
+                        etree.SubElement(detalleAir, 'codRetAir').text = tax.tax.code_electronic.code
+                        etree.SubElement(detalleAir, 'baseImpAir').text = '{:.2f}'.format(tax.base)
+                        etree.SubElement(detalleAir, 'porcentajeAir').text = '{:.2f}'.format(tax.tax.rate * (-100))
+                        etree.SubElement(detalleAir, 'valRetAir').text = '{:.2f}'.format(tax.amount*(-1))
+                    if (tax.tax.code_electronic.code == '345') |( tax.tax.code_electronic.code == '345A') | (tax.tax.code_electronic.code ==  '346'):
+                        etree.SubElement(detalleAir, 'fechaPagoDiv').text = inv.invoice_date.strftime('%d/%m/%Y')
+                    if (tax.tax.code_electronic.code == '327') | (tax.tax.code_electronic.code =='330') | (tax.tax.code_electronic.code =='504') | (tax.tax.code_electronic.code=='504D'):
+                        etree.SubElement(detalleAir, 'imRentaSoc').text = '000' #pendiente
+                        etree.SubElement(detalleAir, 'anioUtDiv').text = '000' #pendiente
+                air.append(detalleAir)
+                detallecompras.append(air)
+                etree.SubElement(detallecompras, 'estabRetencion1').text = withholding.number_w[0:3]
+                etree.SubElement(detallecompras, 'ptoEmiRetencion1').text = withholding.number_w[4:7]
+                etree.SubElement(detallecompras, 'secRetencion1').text = withholding.number_w[8:16]
+                etree.SubElement(detallecompras, 'autRetencion1').text = '000' #pendiente
+                etree.SubElement(detallecompras, 'fechaEmiRet1').text = '000' #pendiente
+                etree.SubElement(detallecompras, 'docModificado').text = '0'
+                etree.SubElement(detallecompras, 'estabModificado').text = '000'
+                etree.SubElement(detallecompras, 'ptoEmiModificado').text = '000'
+                etree.SubElement(detallecompras, 'secModificado').text = '0'
+                etree.SubElement(detallecompras, 'autModificado').text = '0000'
             compras.append(detallecompras)
         ats.append(compras)
         partys = Party.search([('active', '=','true')])
@@ -429,3 +421,137 @@ class ATSExport(Wizard):
         return {
             'file': file_,
             }
+
+class PrintTalonStart(ModelView):
+    'Print Talon Start'
+    __name__ = 'nodux_account_ats.print_talon.start'
+    company = fields.Many2One('company.company', 'Company', required=True)
+    fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
+        required=True)
+    periodo = fields.Many2One('account.period', 'Period',
+        domain=[('fiscalyear', '=', Eval('fiscalyear'))], required = True )
+
+    @staticmethod
+    def default_company():
+        return Transaction().context.get('company')
+
+class PrintTalon(Wizard):
+    'Print Talon'
+    __name__ = 'nodux_account_ats.print_talon'
+    start = StateView('nodux_account_ats.print_talon.start',
+        'nodux_account_ats.print_talon_start_view_form', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('Print', 'print_', 'tryton-print', default=True),
+            ])
+    print_ = StateAction('nodux_account_ats.report_talon')
+
+    def do_print_(self, action):
+
+        data = {
+            'company': self.start.company.id,
+            'fiscalyear' : self.start.fiscalyear,
+            'periodo' : self.start.periodo
+            }
+        return action, data
+
+    def transition_print_(self):
+        return 'end'
+
+class ReportTalon(Report):
+    'Report Talon'
+    __name__ = 'nodux_account_ats.talon'
+
+    @classmethod
+    def parse(cls, report, objects, data, localcontext):
+        print "Llega"
+        Company = Pool().get('company.company')
+        company_id = Transaction().context.get('company')
+        company = Company(company_id)
+        Period = Pool().get('account.period')
+        if company.timezone:
+            timezone = pytz.timezone(company.timezone)
+            dt = datetime.now()
+            hora = datetime.astimezone(dt.replace(tzinfo=pytz.utc), timezone)
+        print "Pasa **",data
+        localcontext['company'] = company
+        localcontext['periodo'] = Period(data['fiscalyear'])
+        localcontext['hora'] = hora.strftime('%H:%M:%S')
+        localcontext['fecha'] = hora.strftime('%d/%m/%Y')
+        localcontext['no_fac_compras']= Decimal(0.0)
+        localcontext['bi0_fac_compras']= Decimal(0.0)
+        localcontext['bi12_fac_compras']= Decimal(0.0)
+        localcontext['noIva_fac_compras']= Decimal(0.0)
+        localcontext['Iva_fac_compras']= Decimal(0.0)
+        localcontext['no_bol_compras']= Decimal(0.0)
+        localcontext['bi0_bol_compras']= Decimal(0.0)
+        localcontext['bi12_bol_compras']= Decimal(0.0)
+        localcontext['noIva_bol_compras']= Decimal(0.0)
+        localcontext['Iva_bol_compras']= Decimal(0.0)
+        localcontext['no_nc_compras']= Decimal(0.0)
+        localcontext['bi0_nc_compras']= Decimal(0.0)
+        localcontext['bi12_nc_compras']= Decimal(0.0)
+        localcontext['noIva_nc_compras']= Decimal(0.0)
+        localcontext['Iva_nc_compras']= Decimal(0.0)
+        localcontext['no_cp_compras']= Decimal(0.0)
+        localcontext['bi0_cp_compras']= Decimal(0.0)
+        localcontext['bi12_cp_compras']= Decimal(0.0)
+        localcontext['noIva_cp_compras']= Decimal(0.0)
+        localcontext['Iva_cp_compras']= Decimal(0.0)
+        localcontext['no_estado_compras']= Decimal(0.0)
+        localcontext['bi0_estado_compras']= Decimal(0.0)
+        localcontext['bi12_estado_compras']= Decimal(0.0)
+        localcontext['noIva_estado_compras']= Decimal(0.0)
+        localcontext['Iva_estado_compras']= Decimal(0.0)
+        localcontext['total_reg_compras']= Decimal(0.0)
+        localcontext['total_bi0_compras']= Decimal(0.0)
+        localcontext['total_bi12_compras']= Decimal(0.0)
+        localcontext['total_noIva_compras']= Decimal(0.0)
+        localcontext['total_iva_compras']= Decimal(0.0)
+        localcontext['no_nc_ventas']=Decimal(0.0)
+        localcontext['bi0_nc_ventas']=Decimal(0.0)
+        localcontext['bi12_nc_ventas']=Decimal(0.0)
+        localcontext['noIva_nc_ventas']=Decimal(0.0)
+        localcontext['Iva_nc_ventas']=Decimal(0.0)
+        localcontext['no_fac_ventas']=Decimal(0.0)
+        localcontext['bi0_fac_ventas']=Decimal(0.0)
+        localcontext['bi12_fac_ventas']=Decimal(0.0)
+        localcontext['noIva_fac_ventas']=Decimal(0.0)
+        localcontext['Iva_fac_ventas']=Decimal(0.0)
+        localcontext['total_reg_ventas']=Decimal(0.0)
+        localcontext['total_bi0_ventas']=Decimal(0.0)
+        localcontext['total_bi12_ventas']=Decimal(0.0)
+        localcontext['total_noIva_ventas']=Decimal(0.0)
+        localcontext['total_iva_ventas']=Decimal(0.0)
+        localcontext['anulados']=Decimal(0.0)
+        localcontext['no_303']=Decimal(0.0)
+        localcontext['base_303']=Decimal(0.0)
+        localcontext['retenido_303']=Decimal(0.0)
+        localcontext['no_310']=Decimal(0.0)
+        localcontext['base_310']=Decimal(0.0)
+        localcontext['retenido_310']=Decimal(0.0)
+        localcontext['no_312']=Decimal(0.0)
+        localcontext['base_312']=Decimal(0.0)
+        localcontext['retenido_312']=Decimal(0.0)
+        localcontext['no_320']=Decimal(0.0)
+        localcontext['base_320']=Decimal(0.0)
+        localcontext['retenido_320']=Decimal(0.0)
+        localcontext['no_342']=Decimal(0.0)
+        localcontext['base_342']=Decimal(0.0)
+        localcontext['retenido_342']=Decimal(0.0)
+        localcontext['no_344']=Decimal(0.0)
+        localcontext['base_344']=Decimal(0.0)
+        localcontext['retenido_344']=Decimal(0.0)
+        localcontext['no_retenciones']=Decimal(0.0)
+        localcontext['base_retenciones']=Decimal(0.0)
+        localcontext['retenido_retenciones']=Decimal(0.0)
+        localcontext['retenido_10']=Decimal(0.0)
+        localcontext['retenido_20']=Decimal(0.0)
+        localcontext['retenido_30']=Decimal(0.0)
+        localcontext['retenido_70']=Decimal(0.0)
+        localcontext['retenido_100']=Decimal(0.0)
+        localcontext['total_retenido']=Decimal(0.0)
+        localcontext['iva_retenido_venta']=Decimal(0.0)
+        localcontext['renta_retenido_venta']=Decimal(0.0)
+        print "localcontext", localcontext
+
+        return super(ReportTalon, cls).parse(report, objects, data, localcontext)

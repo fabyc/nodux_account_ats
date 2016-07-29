@@ -5,15 +5,20 @@ from trytond.pool import Pool
 from .party import *
 from .account import *
 from .invoice import *
+
 def register():
     Pool.register(
-        FormaPago,
         SustentoComprobante,
         ATSStart,
         ATSExportResult,
         Party,
         Invoice,
+        PrintTalonStart,
         module='nodux_account_ats', type_='model')
     Pool.register(
+        ReportTalon,
+        module='nodux_account_ats', type_='report')
+    Pool.register(
         ATSExport,
+        PrintTalon,
         module='nodux_account_ats', type_='wizard')

@@ -4,7 +4,7 @@ this repository contains the full copyright notices and license terms. -->
 <tryton>
     <data>
         <record model="account.formas_pago" id="afp_1">
-            <field name="name">SIN UTILIZACIÓN DEL SISTEMA FINANCIERO</field>
+            <field name="name">SIN UTILIZACIÓN DEL SISTEMA FINANCIERO (Efectivo)</field>
             <field name="code">01</field>
         </record>
         <record model="account.formas_pago" id="afp_2">
@@ -63,6 +63,17 @@ this repository contains the full copyright notices and license terms. -->
             <field name="name">COMPENSACIÓN DE DEUDAS</field>
             <field name="code">15</field>
         </record>
-
+        <record model="account.formas_pago" id="afp_16">
+          <field name="name">TARJETA DE DÉBITO</field>
+          <field name="code">16</field>
+        </record>
+        <record model="account.formas_pago" id="afp_17">
+          <field name="name">DINERO ELECTRÓNICO</field>
+          <field name="code">17</field>
+        </record>
+        <record model="account.formas_pago" id="afp_18">
+          <field name="name">TARJETA PREPAGO</field>
+          <field name="code">18</field>
+        </record>
     </data>
 </tryton>

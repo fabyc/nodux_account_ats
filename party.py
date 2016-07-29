@@ -62,7 +62,7 @@ class Party:
             ],'Sujeto a retencion', help='Pago al exterior sujeto a retencion en aplicacion a la norma legal', states={
             'invisible': Eval('convenio_doble')!= 'NO',
             })
-            
+
     tipo_proveedor = fields.Selection([
             ('', ''),
             ('01', 'Persona Natural'),
@@ -70,6 +70,10 @@ class Party:
             ], u'Identificacion del Proveedor', help ='Tipo de identificacion del Proveedor', states={
             'invisible': Eval('type_document')!= '07',
             })
+
+    num_autorizacion =  fields.Char('Autorizacion SRI No.')
+    fecha_inicio = fields.Date('Fecha inicio autorizacion')
+    fecha_fin = fields.Date('Fecha fin autorizacion')
 
     @staticmethod
     def default_parte_relacional():
@@ -86,4 +90,3 @@ class Party:
     @classmethod
     def __setup__(cls):
         super(Party, cls).__setup__()
-
