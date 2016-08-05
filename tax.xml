@@ -14,7 +14,7 @@ this repository contains the full copyright notices and license terms. -->
             <field name="type">form</field>
             <field name="name">sustento_form</field>
         </record>
-        
+
         <record model="ir.action.act_window" id="act_sustento_form">
             <field name="name">Sustento del comprobante ATS</field>
             <field name="res_model">account.sustento</field>
@@ -31,6 +31,6 @@ this repository contains the full copyright notices and license terms. -->
         </record>
         <menuitem parent="account.menu_taxes" action="act_sustento_form"
             id="menu_sustento_form"/>
-            
+
     </data>
 </tryton>

@@ -14,11 +14,6 @@ __metaclass__ = PoolMeta
 class Invoice():
     __name__ = 'account.invoice'
 
-    forma_de_pago = fields.Many2One('account.formas_pago', 'Formas de Pago', states={
-            'invisible': Eval('type') != 'in_invoice',
-            'readonly' : Eval('state') != 'draft',
-            }, help = u'Seleccionar una forma de pago, cuando monto a pagar sea mayor a $1000')
-
     numero_autorizacion_invoice = fields.Char(u'Número de autorización', size=49, states={
             'invisible': Eval('type') != 'in_invoice',
             'readonly' : Eval('state') != 'draft',
