@@ -449,8 +449,8 @@ class PrintTalon(Wizard):
 
         data = {
             'company': self.start.company.id,
-            'fiscalyear' : self.start.fiscalyear,
-            'periodo' : self.start.periodo
+            'fiscalyear' : self.start.fiscalyear.id,
+            'periodo' : self.start.periodo.id,
             }
         return action, data
 
