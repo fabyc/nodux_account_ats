@@ -48,7 +48,7 @@ identificacionCliente = {
     }
 
 tipoDocumento = {
-    'out_invoice': '01',
+    'out_invoice': '18',
     'out_credit_note': '04',
     'out_debit_note': '05',
     'out_shipment': '06',
@@ -138,8 +138,6 @@ class ATSStart(ModelView):
         period = Period(data['periodo'])
 
         company = Company.search([('id', '=', Transaction().context.get('company'))])
-        print "Transaction ", Transaction().context
-        print "Empresa ", company
         for c in company:
             c_=c
             id_informante = c.party.vat_number
@@ -156,16 +154,17 @@ class ATSStart(ModelView):
         lines = MoveLine.search([('state', '=', 'valid')])
         total_ventas_paid = Decimal(0.0)
         total_paid = Decimal(0.0)
-        print "Todas ", invoices_all
+        #print "Todas ", invoices_all
 
         for i_all in invoices_all:
-            for i in i_all:
-                for l in lines:
-                    if i.move == l.move:
-                        total_ventas_paid = total_ventas_paid + l.debit
-                        print "Total paid ", total_ventas_paid
+            if i_all != []:
+                for i in i_all:
+                    for l in lines:
+                        if i.move == l.move:
+                            total_ventas_paid = total_ventas_paid + l.debit
+                        #print "Total paid ", total_ventas_paid
         total_ventas = total_ventas_paid
-        print "Total ventas ", total_ventas, fiscalyear.start_date, period.start_date
+        #print "Total ventas ", total_ventas, fiscalyear.start_date, period.start_date
         ats = etree.Element('iva')
         etree.SubElement(ats, 'TipoIDInformante').text = 'R'
         etree.SubElement(ats, 'IdInformante').text = id_informante
@@ -173,51 +172,130 @@ class ATSStart(ModelView):
         etree.SubElement(ats, 'Anio').text = fiscalyear.start_date.strftime('%Y')
         etree.SubElement(ats, 'Mes').text = period.start_date.strftime('%m')
         #numero de establecimientos del emisor->entero
-        etree.SubElement(ats, 'numEstabRuc').text = '003'
-        etree.SubElement(ats, 'totalVentas').text = str(total_ventas)
+        etree.SubElement(ats, 'numEstabRuc').text = '001'
+        etree.SubElement(ats, 'totalVentas').text = '0.00'
         etree.SubElement(ats, 'codigoOperativo').text = 'IVA'
         compras = etree.Element('compras')
 
-        invoices = Invoice.search([('state','in',['posted','paid']), ('type','=','in_invoice')])
+        invoices = Invoice.search([('state','in',['posted','paid']), ('type','=','in_invoice'), ("invoice_date", '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        subtotal0 = Decimal(0.00)
+        subtotal14 = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+
 
         for inv in invoices:
+            for line in inv.lines:
+                taxes1 = None
+                taxes2 = None
+                taxes3 = None
+                if line.product.taxes_category == True:
+                    if line.product.category.taxes_parent == True:
+                        taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                    else:
+                        taxes1= Taxes1.search([('category','=', line.product.category)])
+                else:
+                    taxes3 = Taxes2.search([('product','=', line.product)])
+                if taxes1:
+                    for t in taxes1:
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                            subtotal0= subtotal0 + (line.amount)
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                            subtotal14= subtotal14 + (line.amount)
+                elif taxes2:
+                    for t in taxes2:
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                            subtotal0= subtotal0 + (line.amount)
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                            subtotal14= subtotal0 + (line.amount)
+                elif taxes3:
+                    for t in taxes3:
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                            subtotal0= subtotal0 + (line.amount)
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                            subtotal14= subtotal14 + (line.amount)
+
+            basegrav = inv.untaxed_amount - subtotal0
             detallecompras = etree.Element('detalleCompras')
-            #pendiente codigo de sustento
-            etree.SubElement(detallecompras, 'codSustento').text = inv.party.tipo_sustento.code
+            if inv.party.tipo_sustento:
+                etree.SubElement(detallecompras, 'codSustento').text = inv.party.tipo_sustento.code
+            else:
+                inv.raise_user_error('No ha configurado el tipo de sustento del tercero %s. \nDirijase a Terceros->Terceros->Seleccione y modifique', inv.party.name)
             etree.SubElement(detallecompras, 'tpIdProv').text = tipoIdentificacion[inv.party.type_document]
             etree.SubElement(detallecompras, 'idProv').text = inv.party.vat_number
             etree.SubElement(detallecompras, 'tipoComprobante').text = tipoDocumento[inv.type]
+            etree.SubElement(detallecompras, 'parteRel').text = inv.party.parte_relacional
             if tipoIdentificacion[inv.party.type_document] == '03':
                 etree.SubElement(detallecompras, 'tipoProv').text = tipoProvedor[inv.party.type_party]
-            etree.SubElement(detallecompras, 'parteRelVtas').text = inv.party.parte_relacional
             etree.SubElement(detallecompras, 'fechaRegistro').text = inv.invoice_date.strftime('%d/%m/%Y')
-            etree.SubElement(detallecompras, 'establecimiento').text = '001'
-            etree.SubElement(detallecompras, 'puntoEmision').text = '001'
-            etree.SubElement(detallecompras, 'secuencial').text = inv.number
+            etree.SubElement(detallecompras, 'establecimiento').text = inv.reference[0:3]
+            etree.SubElement(detallecompras, 'puntoEmision').text = inv.reference[4:7]
+            etree.SubElement(detallecompras, 'secuencial').text = inv.reference[8:17]
             etree.SubElement(detallecompras, 'fechaEmision').text = inv.invoice_date.strftime('%d/%m/%Y')
-            etree.SubElement(detallecompras, 'autorizacion').text = inv.numero_autorizacion
-            etree.SubElement(detallecompras, 'baseNoGraIva').text = '001' #corregir
-            etree.SubElement(detallecompras, 'baseImponible').text = '001' #corregir
-            etree.SubElement(detallecompras, 'baseImpGrav').text = '%.2f'%inv.untaxed_amount
+            #if inv.numero_autorizacion_invoice:
+            etree.SubElement(detallecompras, 'autorizacion').text = inv.numero_autorizacion_invoice
+            etree.SubElement(detallecompras, 'baseNoGraIva').text = '0.00'
+            etree.SubElement(detallecompras, 'baseImponible').text = '%.2f'%subtotal0
+            etree.SubElement(detallecompras, 'baseImpGrav').text = '%.2f'%subtotal14
+            etree.SubElement(detallecompras, 'baseImpExe').text = '0.00'
             etree.SubElement(detallecompras, 'montoIce').text = '0.00'
             etree.SubElement(detallecompras, 'montoIva').text = '%.2f'%inv.tax_amount
-            etree.SubElement(detallecompras, 'valorRetBienes').text = '%.2f'%abs(inv.tax_amount)
+            withholding_iva = None
+            valRetBien10 = Decimal(0.0)
+            valRetServ20 = Decimal(0.0)
+            valorRetBienes = Decimal(0.0)
+            valRetServ50 = Decimal(0.0)
+            valorRetServicios = Decimal(0.0)
+            valRetServ100 = Decimal(0.0)
+            if inv.ref_withholding:
+                Withholding_iva = pool.get('account.withholding')
+                Withholding_tax = pool.get('account.withholding.tax')
+                withholdings_iva = Withholding_iva.search([('number', '=', inv.ref_withholding)])
+                for w_iva in withholdings_iva:
+                    for w_taxes in w_iva.taxes:
+                        if w_taxes.tax.code_electronic.code == '9':
+                            valRetBien10 = w_taxes.amount * (-1)
+                        if w_taxes.tax.code_electronic.code == '10':
+                            valRetServ20 = w_taxes.amount * (-1)
+                        if w_taxes.tax.code_electronic.code == '1':
+                            valorRetBienes = w_taxes.amount * (-1)
+                        if w_taxes.tax.code_electronic.code == '2':
+                            valorRetServicios = w_taxes.amount * (-1)
+                        if w_taxes.tax.code_electronic.code == '3':
+                            valRetServ100 = w_taxes.amount * (-1)
 
-            etree.SubElement(detallecompras, 'valorRetServicios').text = '000' #corregir'%.2f'
-            etree.SubElement(detallecompras, 'valRetServ100').text = '000' #corregir'%.2f'
+            etree.SubElement(detallecompras, 'valRetBien10').text = '%.2f'%valRetBien10
+            etree.SubElement(detallecompras, 'valRetServ20').text =  '%.2f'%valRetServ20
+            etree.SubElement(detallecompras, 'valorRetBienes').text =  '%.2f'%valorRetBienes
+            etree.SubElement(detallecompras, 'valRetServ50').text =  '%.2f'%valRetServ50
+            etree.SubElement(detallecompras, 'valorRetServicios').text =  '%.2f'%valorRetServicios
+            etree.SubElement(detallecompras, 'valRetServ100').text =  '%.2f'%valRetServ100
+            etree.SubElement(detallecompras, 'totbasesImpReemb').text = '0.00'
             pagoExterior = etree.Element('pagoExterior')
             etree.SubElement(pagoExterior, 'pagoLocExt').text = inv.party.tipo_de_pago
-
-            etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = inv.party.convenio_doble
-            etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = inv.party.sujeto_retencion
-            etree.SubElement(pagoExterior, 'pagoRegFis').text = inv.party.pago_regimen
+            etree.SubElement(pagoExterior, 'paisEfecPago').text = "NA"
+            if inv.party.convenio_doble != "NO":
+                etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = inv.party.convenio_doble
+            else:
+                etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = "NA"
+            if inv.party.sujeto_retencion != "NO":
+                etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = inv.party.sujeto_retencion
+            else:
+                etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = "NA"
+            """
+            if inv.party.pago_regimen:
+                etree.SubElement(pagoExterior, 'pagoRegFis').text = inv.party.pago_regimen
+            else:
+                etree.SubElement(pagoExterior, 'pagoRegFis').text = "NA"
             detallecompras.append(pagoExterior)
             """
-            if inv.formas_de_pago:
+            detallecompras.append(pagoExterior)
+            if inv.formas_pago_sri and subtotal14 >= Decimal(1000.0):
                 formasDePago = etree.Element('formasDePago')
-                etree.SubElement(formasDePago, 'formaPago').text = inv.formas_de_pago
+                etree.SubElement(formasDePago, 'formaPago').text = inv.formas_pago_sri.code
                 detallecompras.append(formasDePago)
-            """
+
             withholding = None
             if inv.ref_withholding:
                 Withholding = pool.get('account.withholding')
@@ -230,7 +308,10 @@ class ATSStart(ModelView):
             if withholding != None:
                 for tax in withholding.taxes:
                     if tax.tipo == 'RENTA':
-                        etree.SubElement(detalleAir, 'codRetAir').text = tax.tax.code_electronic.code
+                        if tax.tax.code_electronic:
+                            etree.SubElement(detalleAir, 'codRetAir').text = tax.tax.code_electronic.code
+                        else:
+                            withholding.raise_user_error(u'No ha configurado el codigo del impuesto %s. Dirijase a:\nFinanciero->Configuracion->Impuestos->Impuestos\nSeleciones el impuesto\nAgrgue el codigo en:Codigo para Retencion-Comp. Elect', tax.description)
                         etree.SubElement(detalleAir, 'baseImpAir').text = '{:.2f}'.format(tax.base)
                         etree.SubElement(detalleAir, 'porcentajeAir').text = '{:.2f}'.format(tax.tax.rate * (-100))
                         etree.SubElement(detalleAir, 'valRetAir').text = '{:.2f}'.format(tax.amount*(-1))
@@ -244,24 +325,26 @@ class ATSStart(ModelView):
                 etree.SubElement(detallecompras, 'estabRetencion1').text = withholding.number_w[0:3]
                 etree.SubElement(detallecompras, 'ptoEmiRetencion1').text = withholding.number_w[4:7]
                 etree.SubElement(detallecompras, 'secRetencion1').text = withholding.number_w[8:16]
-                etree.SubElement(detallecompras, 'autRetencion1').text = '000' #pendiente
-                etree.SubElement(detallecompras, 'fechaEmiRet1').text = '000' #pendiente
+                if withholding.numero_autorizacion:
+                    etree.SubElement(detallecompras, 'autRetencion1').text = withholding.numero_autorizacion
+                etree.SubElement(detallecompras, 'fechaEmiRet1').text = withholding.withholding_date.strftime('%d/%m/%Y')
+                """
                 etree.SubElement(detallecompras, 'docModificado').text = '0'
                 etree.SubElement(detallecompras, 'estabModificado').text = '000'
                 etree.SubElement(detallecompras, 'ptoEmiModificado').text = '000'
                 etree.SubElement(detallecompras, 'secModificado').text = '0'
                 etree.SubElement(detallecompras, 'autModificado').text = '0000'
+                """
             compras.append(detallecompras)
         ats.append(compras)
         partys = Party.search([('active', '=','true')])
         invoice_line = InvoiceLine.search([('invoice','!=','')])
-        numeroComprobantes = 0
-        base_parcial = 0
-        base_imponible = 0
-        montoIva = 0
-        ventas_establecimiento = 0
-        baseImponible = 0
-
+        base_parcial = Decimal('0.0')
+        base_imponible = Decimal('0.0')
+        montoIva = Decimal('0.0')
+        ventas_establecimiento = Decimal('0.0')
+        baseImponible = Decimal('0.0')
+        total_de_ventas = 0
         ventas = etree.Element('ventas')
         terceros = []
         for inv_all in invoices_all:
@@ -270,62 +353,92 @@ class ATSStart(ModelView):
                     pass
                 else:
                     terceros.append(i_p.party)
-        print "Terceros", terceros
         invoices_all_party= []
-
+        #print "Los terceros ", terceros
         for party in terceros:
-            print "El tercero ", party, party.id
+            #print "Si ingresa"
             detalleVentas = etree.Element('detalleVentas')
             if party.type_document:
+                pass
                 etree.SubElement(detalleVentas, 'tpIdCliente').text = identificacionCliente[party.type_document]
             else:
                 cls.raise_user_error('No ha configurado el tipo de documento del tercero')
             etree.SubElement(detalleVentas, 'idCliente').text = party.vat_number
             etree.SubElement(detalleVentas, 'parteRelVtas').text = party.parte_relacional
-            for m in move:
-                print "Move ", move
-                invoices_a_p= Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('move', '=', m.id), ('party', '=',party.id)])
-                invoices_all_party.append(invoices_a_p)
-                print "Todas del tercero", invoices_all_party
+            #for m in move:
+            #print "Move ", move
+            invoices_a_p = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('party', '=',party.id), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+            if invoices_a_p != []:
+                invoices_all_party = invoices_a_p
             base = Decimal(0.0)
             mIva = Decimal(0.0)
-            etree.SubElement(detalleVentas, 'tipoComprobante').text = '01'
+            subtotal_v_0 = Decimal(0.0)
+            subtotal_v_14 = Decimal(0.0)
+            etree.SubElement(detalleVentas, 'tipoComprobante').text = '18'
+            numeroComprobantes = 0
 
-            for inv_outs in invoices_all_party:
-                for inv_out in inv_outs:
-                    print "La factura es : ", inv_out
-                    for i_line in invoice_line:
-                        print "Daots de suma inicial", base_parcial, baseImponible, montoIva
-                        print "atos de factura ",i_line.invoice.id, inv_out.id
-                        if i_line.invoice.id == inv_out.id:
-                            base_parcial = (i_line.unit_price)*Decimal(i_line.quantity)
-                            baseImponible = base_parcial + base_imponible
-                            montoIva = (baseImponible * (12))/100
-                            print "Datos de suma ", base_parcial, baseImponible, montoIva
+            if invoices_all_party != []:
+                for inv_out in invoices_all_party:
+                    if inv_out.formas_pago_sri:
+                        forma_pago = inv_out.formas_pago_sri.code
+                    else:
+                        forma_pago = None
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    for line in inv_out.lines:
+                        if line.product.taxes_category == True:
+                            if line.product.category.taxes_parent == True:
+                                taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                            else:
+                                taxes1= Taxes1.search([('category','=', line.product.category)])
+                        else:
+                            taxes3 = Taxes2.search([('product','=', line.product)])
+                        if taxes1:
+                            for t in taxes1:
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                    subtotal_v_0= subtotal_v_0 + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                    subtotal_v_14= subtotal_v_14 + (line.amount)
+                        elif taxes2:
+                            for t in taxes2:
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                    subtotal_v_0= subtotal_v_0 + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                    subtotal_v_14= subtotal_v_14 + (line.amount)
+                        elif taxes3:
+                            for t in taxes3:
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                    subtotal_v_0= subtotal_v_0 + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                    subtotal_v_14= subtotal_v_14 + (line.amount)
 
-                    base = baseImponible + base
-                    mIva = mIva + montoIva
-                numeroComprobantes = numeroComprobantes + 1
+                    baseImponible = (subtotal_v_14)
+                    montoIva = (baseImponible * (14))/100
+                    total_de_ventas += inv_out.total_amount
+                    numeroComprobantes += 1
 
-                print "base ", baseImponible, base, montoIva, mIva
-            print "El numero de comprobante", numeroComprobantes
+            etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
             etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
-            etree.SubElement(detalleVentas, 'baseNoGraIva').text = '000' #pendiente
-            etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (base)
-            etree.SubElement(detalleVentas, 'baseImpGrav').text = '000' #pendiente
-            etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (mIva)
-            etree.SubElement(detalleVentas, 'valorRetIva').text = '000' #pendiente
-            etree.SubElement(detalleVentas, 'valorRetRenta').text = '000' #pendiente
+            etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00' #pendiente
+            etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0)
+            etree.SubElement(detalleVentas, 'baseImpGrav').text = '%.2f' % (subtotal_v_14)
+            etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (montoIva)
+            etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
+            etree.SubElement(detalleVentas, 'valorRetIva').text = '0.00' #pendiente
+            etree.SubElement(detalleVentas, 'valorRetRenta').text = '0.00' #pendiente
+            formasDePago = etree.Element('formasDePago')
+            etree.SubElement(formasDePago, 'formaPago').text = forma_pago
+            detalleVentas.append(formasDePago)
             ventas.append(detalleVentas)
-            ats.append(ventas)
-            ventas_establecimiento = baseImponible + ventas_establecimiento
+        ats.append(ventas)
 
-        """ Ventas establecimiento """
 
         ventasEstablecimiento = etree.Element('ventasEstablecimiento')
         ventaEst = etree.Element('ventaEst')
-        etree.SubElement(ventaEst, 'codEstab').text = '001' #pendiente
-        etree.SubElement(ventaEst, 'ventasEstab').text = '000' #pendiente
+        etree.SubElement(ventaEst, 'codEstab').text = '001'
+        etree.SubElement(ventaEst, 'ventasEstab').text = '0.00'
+        etree.SubElement(ventaEst, 'ivaComp').text = '0.00'
         ventasEstablecimiento.append(ventaEst)
         ats.append(ventasEstablecimiento)
         """Documentos Anulados"""
@@ -355,7 +468,9 @@ class ATSStart(ModelView):
         MESSAGE_INVALID = u'El sistema genero el XML pero los datos no pasan la validacion XSD. Revise el error: \n %s'
         file_path = os.path.join(os.path.dirname(__file__), 'ats.xsd')
         schema_file = open(file_path)
-        file_ats = etree.tostring(ats, pretty_print=True, encoding='iso-8859-1')
+        #file_ats = etree.tostring(ats, encoding='utf8', method='xml')
+        file_ats = etree.tostring(ats, xml_declaration=True, encoding="utf-8")
+        #file_ats = etree.tostring(ats, pretty_print=True, encoding='iso-8859-1')
         xmlschema_doc = etree.parse(schema_file)
         xmlschema = etree.XMLSchema(xmlschema_doc)
 
@@ -364,12 +479,11 @@ class ATSStart(ModelView):
         except DocumentInvalid as e:
             print e
             #cls.raise_user_error(MESSAGE_INVALID, str(e))
-
         buf = StringIO()
         buf.write(file_ats)
         out=base64.encodestring(buf.getvalue())
+        name = "%s%s%s.xml" % ("AT",period.name[5:7],  period.name[0:4])
         buf.close()
-        #name = "%s%s%s.XML" % ("AT", period_id.name[:2], period_id.name[3:8])
         return file_ats
 
 class ATSExportResult(ModelView):
@@ -396,7 +510,6 @@ class ATSExport(Wizard):
     def transition_export(cls):
         pool = Pool()
         Account = pool.get('nodux_account_ats.print_ats.start')
-
 
         if cls.start.fiscalyear:
             anio = cls.start.fiscalyear
@@ -463,7 +576,7 @@ class ReportTalon(Report):
 
     @classmethod
     def parse(cls, report, objects, data, localcontext):
-        print "Llega"
+        #print "Llega"
         Company = Pool().get('company.company')
         company_id = Transaction().context.get('company')
         company = Company(company_id)
@@ -472,86 +585,86 @@ class ReportTalon(Report):
             timezone = pytz.timezone(company.timezone)
             dt = datetime.now()
             hora = datetime.astimezone(dt.replace(tzinfo=pytz.utc), timezone)
-        print "Pasa **",data
+        #print "Pasa **",data
         localcontext['company'] = company
         localcontext['periodo'] = Period(data['fiscalyear'])
         localcontext['hora'] = hora.strftime('%H:%M:%S')
         localcontext['fecha'] = hora.strftime('%d/%m/%Y')
-        localcontext['no_fac_compras']= Decimal(0.0)
-        localcontext['bi0_fac_compras']= Decimal(0.0)
-        localcontext['bi12_fac_compras']= Decimal(0.0)
-        localcontext['noIva_fac_compras']= Decimal(0.0)
-        localcontext['Iva_fac_compras']= Decimal(0.0)
-        localcontext['no_bol_compras']= Decimal(0.0)
-        localcontext['bi0_bol_compras']= Decimal(0.0)
-        localcontext['bi12_bol_compras']= Decimal(0.0)
-        localcontext['noIva_bol_compras']= Decimal(0.0)
-        localcontext['Iva_bol_compras']= Decimal(0.0)
-        localcontext['no_nc_compras']= Decimal(0.0)
-        localcontext['bi0_nc_compras']= Decimal(0.0)
-        localcontext['bi12_nc_compras']= Decimal(0.0)
-        localcontext['noIva_nc_compras']= Decimal(0.0)
-        localcontext['Iva_nc_compras']= Decimal(0.0)
-        localcontext['no_cp_compras']= Decimal(0.0)
-        localcontext['bi0_cp_compras']= Decimal(0.0)
-        localcontext['bi12_cp_compras']= Decimal(0.0)
-        localcontext['noIva_cp_compras']= Decimal(0.0)
-        localcontext['Iva_cp_compras']= Decimal(0.0)
-        localcontext['no_estado_compras']= Decimal(0.0)
-        localcontext['bi0_estado_compras']= Decimal(0.0)
-        localcontext['bi12_estado_compras']= Decimal(0.0)
-        localcontext['noIva_estado_compras']= Decimal(0.0)
-        localcontext['Iva_estado_compras']= Decimal(0.0)
-        localcontext['total_reg_compras']= Decimal(0.0)
-        localcontext['total_bi0_compras']= Decimal(0.0)
-        localcontext['total_bi12_compras']= Decimal(0.0)
-        localcontext['total_noIva_compras']= Decimal(0.0)
-        localcontext['total_iva_compras']= Decimal(0.0)
-        localcontext['no_nc_ventas']=Decimal(0.0)
-        localcontext['bi0_nc_ventas']=Decimal(0.0)
-        localcontext['bi12_nc_ventas']=Decimal(0.0)
-        localcontext['noIva_nc_ventas']=Decimal(0.0)
-        localcontext['Iva_nc_ventas']=Decimal(0.0)
-        localcontext['no_fac_ventas']=Decimal(0.0)
-        localcontext['bi0_fac_ventas']=Decimal(0.0)
-        localcontext['bi12_fac_ventas']=Decimal(0.0)
-        localcontext['noIva_fac_ventas']=Decimal(0.0)
-        localcontext['Iva_fac_ventas']=Decimal(0.0)
-        localcontext['total_reg_ventas']=Decimal(0.0)
-        localcontext['total_bi0_ventas']=Decimal(0.0)
-        localcontext['total_bi12_ventas']=Decimal(0.0)
-        localcontext['total_noIva_ventas']=Decimal(0.0)
-        localcontext['total_iva_ventas']=Decimal(0.0)
-        localcontext['anulados']=Decimal(0.0)
-        localcontext['no_303']=Decimal(0.0)
-        localcontext['base_303']=Decimal(0.0)
-        localcontext['retenido_303']=Decimal(0.0)
-        localcontext['no_310']=Decimal(0.0)
-        localcontext['base_310']=Decimal(0.0)
-        localcontext['retenido_310']=Decimal(0.0)
-        localcontext['no_312']=Decimal(0.0)
-        localcontext['base_312']=Decimal(0.0)
-        localcontext['retenido_312']=Decimal(0.0)
-        localcontext['no_320']=Decimal(0.0)
-        localcontext['base_320']=Decimal(0.0)
-        localcontext['retenido_320']=Decimal(0.0)
-        localcontext['no_342']=Decimal(0.0)
-        localcontext['base_342']=Decimal(0.0)
-        localcontext['retenido_342']=Decimal(0.0)
-        localcontext['no_344']=Decimal(0.0)
-        localcontext['base_344']=Decimal(0.0)
-        localcontext['retenido_344']=Decimal(0.0)
-        localcontext['no_retenciones']=Decimal(0.0)
-        localcontext['base_retenciones']=Decimal(0.0)
-        localcontext['retenido_retenciones']=Decimal(0.0)
-        localcontext['retenido_10']=Decimal(0.0)
-        localcontext['retenido_20']=Decimal(0.0)
-        localcontext['retenido_30']=Decimal(0.0)
-        localcontext['retenido_70']=Decimal(0.0)
-        localcontext['retenido_100']=Decimal(0.0)
-        localcontext['total_retenido']=Decimal(0.0)
-        localcontext['iva_retenido_venta']=Decimal(0.0)
-        localcontext['renta_retenido_venta']=Decimal(0.0)
-        print "localcontext", localcontext
+        localcontext['no_fac_compras'] = Decimal(0.0)
+        localcontext['bi0_fac_compras'] = Decimal(0.0)
+        localcontext['bi12_fac_compras'] = Decimal(0.0)
+        localcontext['noIva_fac_compras'] = Decimal(0.0)
+        localcontext['Iva_fac_compras'] = Decimal(0.0)
+        localcontext['no_bol_compras'] = Decimal(0.0)
+        localcontext['bi0_bol_compras'] = Decimal(0.0)
+        localcontext['bi12_bol_compras'] = Decimal(0.0)
+        localcontext['noIva_bol_compras'] = Decimal(0.0)
+        localcontext['Iva_bol_compras'] = Decimal(0.0)
+        localcontext['no_nc_compras'] = Decimal(0.0)
+        localcontext['bi0_nc_compras'] = Decimal(0.0)
+        localcontext['bi12_nc_compras'] = Decimal(0.0)
+        localcontext['noIva_nc_compras'] = Decimal(0.0)
+        localcontext['Iva_nc_compras'] = Decimal(0.0)
+        localcontext['no_cp_compras'] = Decimal(0.0)
+        localcontext['bi0_cp_compras'] = Decimal(0.0)
+        localcontext['bi12_cp_compras'] = Decimal(0.0)
+        localcontext['noIva_cp_compras'] = Decimal(0.0)
+        localcontext['Iva_cp_compras'] = Decimal(0.0)
+        localcontext['no_estado_compras'] = Decimal(0.0)
+        localcontext['bi0_estado_compras'] = Decimal(0.0)
+        localcontext['bi12_estado_compras'] = Decimal(0.0)
+        localcontext['noIva_estado_compras'] = Decimal(0.0)
+        localcontext['Iva_estado_compras'] = Decimal(0.0)
+        localcontext['total_reg_compras'] = Decimal(0.0)
+        localcontext['total_bi0_compras'] = Decimal(0.0)
+        localcontext['total_bi12_compras'] = Decimal(0.0)
+        localcontext['total_noIva_compras'] = Decimal(0.0)
+        localcontext['total_iva_compras'] = Decimal(0.0)
+        localcontext['no_nc_ventas'] = Decimal(0.0)
+        localcontext['bi0_nc_ventas'] = Decimal(0.0)
+        localcontext['bi12_nc_ventas'] = Decimal(0.0)
+        localcontext['noIva_nc_ventas'] = Decimal(0.0)
+        localcontext['Iva_nc_ventas'] = Decimal(0.0)
+        localcontext['no_fac_ventas'] = Decimal(0.0)
+        localcontext['bi0_fac_ventas'] = Decimal(0.0)
+        localcontext['bi12_fac_ventas'] = Decimal(0.0)
+        localcontext['noIva_fac_ventas'] = Decimal(0.0)
+        localcontext['Iva_fac_ventas'] = Decimal(0.0)
+        localcontext['total_reg_ventas'] = Decimal(0.0)
+        localcontext['total_bi0_ventas'] = Decimal(0.0)
+        localcontext['total_bi12_ventas'] = Decimal(0.0)
+        localcontext['total_noIva_ventas'] = Decimal(0.0)
+        localcontext['total_iva_ventas'] = Decimal(0.0)
+        localcontext['anulados'] = Decimal(0.0)
+        localcontext['no_303'] = Decimal(0.0)
+        localcontext['base_303'] = Decimal(0.0)
+        localcontext['retenido_303'] = Decimal(0.0)
+        localcontext['no_310'] = Decimal(0.0)
+        localcontext['base_310'] = Decimal(0.0)
+        localcontext['retenido_310'] = Decimal(0.0)
+        localcontext['no_312'] = Decimal(0.0)
+        localcontext['base_312'] = Decimal(0.0)
+        localcontext['retenido_312'] = Decimal(0.0)
+        localcontext['no_320'] = Decimal(0.0)
+        localcontext['base_320'] = Decimal(0.0)
+        localcontext['retenido_320'] = Decimal(0.0)
+        localcontext['no_342'] = Decimal(0.0)
+        localcontext['base_342'] = Decimal(0.0)
+        localcontext['retenido_342'] = Decimal(0.0)
+        localcontext['no_344'] = Decimal(0.0)
+        localcontext['base_344'] = Decimal(0.0)
+        localcontext['retenido_344'] = Decimal(0.0)
+        localcontext['no_retenciones'] = Decimal(0.0)
+        localcontext['base_retenciones'] = Decimal(0.0)
+        localcontext['retenido_retenciones'] = Decimal(0.0)
+        localcontext['retenido_10'] = Decimal(0.0)
+        localcontext['retenido_20'] = Decimal(0.0)
+        localcontext['retenido_30'] = Decimal(0.0)
+        localcontext['retenido_70'] = Decimal(0.0)
+        localcontext['retenido_100'] = Decimal(0.0)
+        localcontext['total_retenido'] = Decimal(0.0)
+        localcontext['iva_retenido_venta'] = Decimal(0.0)
+        localcontext['renta_retenido_venta'] = Decimal(0.0)
+        #print "localcontext", localcontext
 
         return super(ReportTalon, cls).parse(report, objects, data, localcontext)
