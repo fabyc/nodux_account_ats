@@ -536,9 +536,6 @@ class ATSStart(ModelView):
             etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
             etree.SubElement(detalleVentas, 'valorRetIva').text = '%.2f' % (valorRetIvaNC)
             etree.SubElement(detalleVentas, 'valorRetRenta').text = '%.2f' % (valorRetRentaNC)
-            formasDePago = etree.Element('formasDePago')
-            etree.SubElement(formasDePago, 'formaPago').text = forma_pago
-            detalleVentas.append(formasDePago)
             ventas.append(detalleVentas)
         ats.append(ventas)
 
