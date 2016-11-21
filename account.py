@@ -276,11 +276,11 @@ class ATSStart(ModelView):
             pagoExterior = etree.Element('pagoExterior')
             etree.SubElement(pagoExterior, 'pagoLocExt').text = inv.party.tipo_de_pago
             etree.SubElement(pagoExterior, 'paisEfecPago').text = "NA"
-            if inv.party.convenio_doble != "NO":
+            if inv.party.convenio_doble != "NO" and inv.party.convenio_doble != None:
                 etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = inv.party.convenio_doble
             else:
                 etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = "NA"
-            if inv.party.sujeto_retencion != "NO":
+            if inv.party.sujeto_retencion != "NO" and inv.party.sujeto_retencion != None
                 etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = inv.party.sujeto_retencion
             else:
                 etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = "NA"
