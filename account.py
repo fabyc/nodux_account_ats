@@ -179,43 +179,55 @@ class ATSStart(ModelView):
         compras = etree.Element('compras')
 
         invoices = Invoice.search([('state','in',['posted','paid']), ('type','=','in_invoice'), ("invoice_date", '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
-        subtotal0 = Decimal(0.00)
-        subtotal14 = Decimal(0.00)
         pool = Pool()
+        Taxes1I = pool.get('product.category-supplier-account.tax')
+        Taxes2I = pool.get('product.template-supplier-account.tax')
         Taxes1 = pool.get('product.category-customer-account.tax')
         Taxes2 = pool.get('product.template-customer-account.tax')
 
 
+
         for inv in invoices:
+            subtotal14 = Decimal(0.0)
+            subtotal0 = Decimal(0.0)
+            subtotal12 = Decimal(0.0)
             for line in inv.lines:
                 taxes1 = None
                 taxes2 = None
                 taxes3 = None
                 if line.product.taxes_category == True:
                     if line.product.category.taxes_parent == True:
-                        taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        taxes1= Taxes1I.search([('category','=', line.product.category.parent)])
                     else:
-                        taxes1= Taxes1.search([('category','=', line.product.category)])
+                        taxes2= Taxes1I.search([('category','=', line.product.category)])
                 else:
-                    taxes3 = Taxes2.search([('product','=', line.product)])
+                    taxes3 = Taxes2I.search([('product','=', line.product.template)])
+
+                print "Los impuestos ", taxes1, taxes2, taxes3
                 if taxes1:
                     for t in taxes1:
                         if str('{:.0f}'.format(t.tax.rate*100)) == '0':
                             subtotal0= subtotal0 + (line.amount)
                         if str('{:.0f}'.format(t.tax.rate*100)) == '14':
                             subtotal14= subtotal14 + (line.amount)
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                            subtotal12= subtotal12 + (line.amount)
                 elif taxes2:
                     for t in taxes2:
                         if str('{:.0f}'.format(t.tax.rate*100)) == '0':
                             subtotal0= subtotal0 + (line.amount)
                         if str('{:.0f}'.format(t.tax.rate*100)) == '14':
                             subtotal14= subtotal0 + (line.amount)
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                            subtotal12= subtotal12 + (line.amount)
                 elif taxes3:
                     for t in taxes3:
                         if str('{:.0f}'.format(t.tax.rate*100)) == '0':
                             subtotal0= subtotal0 + (line.amount)
                         if str('{:.0f}'.format(t.tax.rate*100)) == '14':
                             subtotal14= subtotal14 + (line.amount)
+                        if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                            subtotal12= subtotal12 + (line.amount)
 
             basegrav = inv.untaxed_amount - subtotal0
             detallecompras = etree.Element('detalleCompras')
@@ -238,7 +250,7 @@ class ATSStart(ModelView):
             etree.SubElement(detallecompras, 'autorizacion').text = inv.numero_autorizacion_invoice
             etree.SubElement(detallecompras, 'baseNoGraIva').text = '0.00'
             etree.SubElement(detallecompras, 'baseImponible').text = '%.2f'%subtotal0
-            etree.SubElement(detallecompras, 'baseImpGrav').text = '%.2f'%subtotal14
+            etree.SubElement(detallecompras, 'baseImpGrav').text = '%.2f'% (subtotal14+subtotal12)
             etree.SubElement(detallecompras, 'baseImpExe').text = '0.00'
             etree.SubElement(detallecompras, 'montoIce').text = '0.00'
             etree.SubElement(detallecompras, 'montoIva').text = '%.2f'%inv.tax_amount
@@ -364,9 +376,11 @@ class ATSStart(ModelView):
                 cls.raise_user_error('No ha configurado el tipo de documento del tercero')
             etree.SubElement(detalleVentas, 'idCliente').text = party.vat_number
             etree.SubElement(detalleVentas, 'parteRelVtas').text = party.parte_relacional
+            print "tercero ", party.id, party.name
             invoices_a_p = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('party', '=',party.id), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
             if invoices_a_p != []:
                 invoices_all_party = invoices_a_p
+            print "Todas las Facturas ", invoices_all_party
             base = Decimal(0.0)
             mIva = Decimal(0.0)
             subtotal_v_0 = Decimal(0.0)
