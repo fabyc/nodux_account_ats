@@ -146,9 +146,10 @@ class ATSStart(ModelView):
         #para total_ventas
         move = Move.search([('period', '=', period)])
         invoices_all = []
-
+        credits_all = Invoice.search([('type','=','out_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
         for m in move:
             invoices_a= Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('move', '=', m.id)])
+
             invoices_all.append(invoices_a)
 
         lines = MoveLine.search([('state', '=', 'valid')])
@@ -354,9 +355,7 @@ class ATSStart(ModelView):
                 else:
                     terceros.append(i_p.party)
         invoices_all_party= []
-        #print "Los terceros ", terceros
         for party in terceros:
-            #print "Si ingresa"
             detalleVentas = etree.Element('detalleVentas')
             if party.type_document:
                 pass
@@ -365,8 +364,6 @@ class ATSStart(ModelView):
                 cls.raise_user_error('No ha configurado el tipo de documento del tercero')
             etree.SubElement(detalleVentas, 'idCliente').text = party.vat_number
             etree.SubElement(detalleVentas, 'parteRelVtas').text = party.parte_relacional
-            #for m in move:
-            #print "Move ", move
             invoices_a_p = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('party', '=',party.id), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
             if invoices_a_p != []:
                 invoices_all_party = invoices_a_p
@@ -376,6 +373,8 @@ class ATSStart(ModelView):
             subtotal_v_14 = Decimal(0.0)
             etree.SubElement(detalleVentas, 'tipoComprobante').text = '18'
             numeroComprobantes = 0
+            valorRetIva = Decimal(0.0)
+            valorRetRenta = Decimal(0.0)
 
             if invoices_all_party != []:
                 for inv_out in invoices_all_party:
@@ -418,15 +417,125 @@ class ATSStart(ModelView):
                     total_de_ventas += inv_out.total_amount
                     numeroComprobantes += 1
 
+                    withholding_out = None
+                    if inv_out.ref_withholding:
+                        WithholdingOut = pool.get('account.withholding')
+                        withholdings_out = WithholdingOut.search([('number', '=', inv_out.ref_withholding)])
+                        for w in withholdings_out:
+                            withholding_out = w
+                    if withholding_out != None:
+                        for tax in withholding_out.taxes:
+                            if tax.tipo == 'IVA':
+                                valorRetIva += tax.amount * (-1)
+                            if tax.tipo == 'RENTA':
+                                valorRetRenta += tax.amount *(-1)
+
             etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
             etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
-            etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00' #pendiente
+            etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
             etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0)
             etree.SubElement(detalleVentas, 'baseImpGrav').text = '%.2f' % (subtotal_v_14)
             etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (montoIva)
             etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
-            etree.SubElement(detalleVentas, 'valorRetIva').text = '0.00' #pendiente
-            etree.SubElement(detalleVentas, 'valorRetRenta').text = '0.00' #pendiente
+            etree.SubElement(detalleVentas, 'valorRetIva').text = '%.2f' % (valorRetIva)
+            etree.SubElement(detalleVentas, 'valorRetRenta').text = '%.2f' % (valorRetRenta)
+            formasDePago = etree.Element('formasDePago')
+            etree.SubElement(formasDePago, 'formaPago').text = forma_pago
+            detalleVentas.append(formasDePago)
+            ventas.append(detalleVentas)
+
+        terceros_credit = []
+        for c_p in credits_all:
+            if c_p.party in terceros_credit:
+                pass
+            else:
+                terceros_credit.append(c_p.party)
+        credits_all_party= []
+
+        for party in terceros_credit:
+            detalleVentas = etree.Element('detalleVentas')
+            if party.type_document:
+                pass
+                etree.SubElement(detalleVentas, 'tpIdCliente').text = identificacionCliente[party.type_document]
+            else:
+                cls.raise_user_error('No ha configurado el tipo de documento del tercero')
+            etree.SubElement(detalleVentas, 'idCliente').text = party.vat_number
+            etree.SubElement(detalleVentas, 'parteRelVtas').text = party.parte_relacional
+            credits_a_p = Invoice.search([('type','=','out_credit_note'), ('state','in',['posted','paid']), ('party', '=',party.id), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+            if credits_a_p != []:
+                credits_all_party = credits_a_p
+            base_nc = Decimal(0.0)
+            mIva_nc = Decimal(0.0)
+            subtotal_v_0_nc = Decimal(0.0)
+            subtotal_v_14_nc = Decimal(0.0)
+            etree.SubElement(detalleVentas, 'tipoComprobante').text = '04'
+            numeroComprobantes = 0
+            valorRetIvaNC = Decimal(0.0)
+            valorRetRentaNC = Decimal(0.0)
+
+            if credits_all_party != []:
+                for cre_out in credits_all_party:
+                    if cre_out.formas_pago_sri:
+                        forma_pago = cre_out.formas_pago_sri.code
+                    else:
+                        forma_pago = None
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    for line in cre_out.lines:
+                        if line.product.taxes_category == True:
+                            if line.product.category.taxes_parent == True:
+                                taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                            else:
+                                taxes1= Taxes1.search([('category','=', line.product.category)])
+                        else:
+                            taxes3 = Taxes2.search([('product','=', line.product)])
+                        if taxes1:
+                            for t in taxes1:
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                    subtotal_v_0_nc= subtotal_v_0_nc + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                    subtotal_v_14_nc = subtotal_v_14_nc + (line.amount)
+                        elif taxes2:
+                            for t in taxes2:
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                    subtotal_v_0_nc= subtotal_v_0_nc + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                    subtotal_v_14_nc= subtotal_v_14_nc + (line.amount)
+                        elif taxes3:
+                            for t in taxes3:
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                    subtotal_v_0_nc= subtotal_v_0_nc + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                    subtotal_v_14_nc= subtotal_v_14_nc + (line.amount)
+
+                    baseImponible_nc = (subtotal_v_14_nc)
+                    montoIva_nc = (baseImponible_nc * (14))/100
+                    total_de_ventas += cre_out.total_amount
+                    numeroComprobantes += 1
+
+                    withholding_nc = None
+                    if cre_out.ref_withholding:
+                        WithholdingNC = pool.get('account.withholding')
+                        withholdings_nc = WithholdingNC.search([('number', '=', cre_out.ref_withholding)])
+                        for w in withholdings_nc:
+                            withholding_nc = w
+                    if withholding_nc != None:
+                        for tax in withholding_nc.taxes:
+                            if tax.tipo == 'IVA':
+                                valorRetIvaNC += tax.amount * (-1)
+                            if tax.tipo == 'RENTA':
+                                valorRetRentaNC += tax.amount *(-1)
+
+            etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
+            etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
+            etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
+            etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0_nc)
+            etree.SubElement(detalleVentas, 'baseImpGrav').text = '%.2f' % (subtotal_v_14_nc)
+            etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (montoIva_nc)
+            etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
+            etree.SubElement(detalleVentas, 'valorRetIva').text = '%.2f' % (valorRetIvaNC)
+            etree.SubElement(detalleVentas, 'valorRetRenta').text = '%.2f' % (valorRetRentaNC)
             formasDePago = etree.Element('formasDePago')
             etree.SubElement(formasDePago, 'formaPago').text = forma_pago
             detalleVentas.append(formasDePago)
