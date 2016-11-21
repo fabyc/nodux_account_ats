@@ -280,7 +280,7 @@ class ATSStart(ModelView):
                 etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = inv.party.convenio_doble
             else:
                 etree.SubElement(pagoExterior, 'aplicConvDobTrib').text = "NA"
-            if inv.party.sujeto_retencion != "NO" and inv.party.sujeto_retencion != None
+            if inv.party.sujeto_retencion != "NO" and inv.party.sujeto_retencion != None:
                 etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = inv.party.sujeto_retencion
             else:
                 etree.SubElement(pagoExterior, 'pagExtSujRetNorLeg').text = "NA"
