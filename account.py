@@ -258,7 +258,7 @@ class ATSStart(ModelView):
             if inv.ref_withholding:
                 Withholding_iva = pool.get('account.withholding')
                 Withholding_tax = pool.get('account.withholding.tax')
-                withholdings_iva = Withholding_iva.search([('number', '=', inv.ref_withholding)])
+                withholdings_iva = Withholding_iva.search([('number', '=', inv.ref_withholding), ('fisic', '=', False)])
                 for w_iva in withholdings_iva:
                     for w_taxes in w_iva.taxes:
                         if w_taxes.tax.code_electronic.code == '9':
