@@ -42,12 +42,8 @@ msgctxt "field:account.invoice,fecha_autorizacion:"
 msgid "Fecha de autorizacion"
 msgstr "Fecha de autorización"
 
-msgctxt "field:account.invoice,forma_de_pago:"
-msgid "Formas de Pago"
-msgstr ""
-
 msgctxt "field:account.invoice,numero_autorizacion:"
-msgid "Número de autorización"
+msgid "Número de Autorización"
 msgstr "Número de autorización"
 
 msgctxt "field:account.invoice,numero_autorizacion_invoice:"
@@ -106,6 +102,22 @@ msgctxt "field:nodux_account_ats.print_ats.start,periodo:"
 msgid "Period"
 msgstr "Período"
 
+msgctxt "field:nodux_account_ats.print_talon.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:nodux_account_ats.print_talon.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Año Fiscal"
+
+msgctxt "field:nodux_account_ats.print_talon.start,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:nodux_account_ats.print_talon.start,periodo:"
+msgid "Period"
+msgstr "Período"
+
 msgctxt "field:party.party,convenio_doble:"
 msgid "Aplica convenio de doble tributacion"
 msgstr "Convenio de doble Tributación"
@@ -150,10 +162,6 @@ msgctxt "field:party.party,type_document:"
 msgid "Type Document"
 msgstr "Tipo de documento"
 
-msgctxt "help:account.invoice,forma_de_pago:"
-msgid "Seleccionar una forma de pago, cuando monto a pagar sea mayor a $1000"
-msgstr ""
-
 msgctxt "help:party.party,convenio_doble:"
 msgid "Aplica convenio de doble tributacion"
 msgstr "Convenio de doble Tributación"
@@ -172,66 +180,6 @@ msgstr ""
 
 msgctxt "model:account.formas_pago,name:"
 msgid "Forma Pago"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_1"
-msgid "SIN UTILIZACIÓN DEL SISTEMA FINANCIERO"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_10"
-msgid "TARJETA DE CRÉDITO NACIONAL"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_11"
-msgid "TARJETA DE CRÉDITO INTERNACIONAL"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_12"
-msgid "GIRO"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_13"
-msgid "DEPÓSITO EN CUENTA (CORRIENTE/AHORROS)"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_14"
-msgid "ENDOSO DE INVERSIÓN"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_15"
-msgid "COMPENSACIÓN DE DEUDAS"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_2"
-msgid "CHEQUE PROPIO"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_3"
-msgid "CHEQUE CERTIFICADO"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_4"
-msgid "CHEQUE DE GERENCIA"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_5"
-msgid "CHEQUE DEL EXTERIOR"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_6"
-msgid "DÉBITO DE CUENTA"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_7"
-msgid "TRANSFERENCIA PROPIO BANCO"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_8"
-msgid "TRANSFERENCIA OTRO BANCO NACIONAL"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:afp_9"
-msgid "TRANSFERENCIA BANCO EXTERIOR"
 msgstr ""
 
 msgctxt "model:account.sustento,name:"
@@ -312,6 +260,14 @@ msgctxt "model:ir.action,name:act_sustento_form"
 msgid "Sustento del comprobante ATS"
 msgstr ""
 
+msgctxt "model:ir.action,name:report_talon"
+msgid "Print ATS"
+msgstr "Imprimir ATS"
+
+msgctxt "model:ir.action,name:wizard_talon"
+msgid "Print ATS"
+msgstr "Imprimir ATS"
+
 msgctxt "model:ir.ui.menu,name:menu_export_ats"
 msgid "Export ATS"
 msgstr "Exportar ATS"
@@ -320,6 +276,10 @@ msgctxt "model:ir.ui.menu,name:menu_sustento_form"
 msgid "Sustento del comprobante ATS"
 msgstr ""
 
+msgctxt "model:ir.ui.menu,name:menu_talon"
+msgid "Print ATS"
+msgstr "Imprimir ATS"
+
 msgctxt "model:nodux_account_ats.ats.export.result,name:"
 msgid "Export result"
 msgstr "Exportar traducción - archivo"
@@ -327,6 +287,10 @@ msgstr "Exportar traducción - archivo"
 msgctxt "model:nodux_account_ats.print_ats.start,name:"
 msgid "Print ATS"
 msgstr "Imprimir ATS"
+
+msgctxt "model:nodux_account_ats.print_talon.start,name:"
+msgid "Print Talon Start"
+msgstr "Imprimir Talon ATS"
 
 msgctxt "selection:party.party,convenio_doble:"
 msgid ""
@@ -451,3 +415,11 @@ msgstr "Cancelar"
 msgctxt "wizard_button:nodux_account_ats.ats.export,start,export:"
 msgid "Export"
 msgstr "Generar"
+
+msgctxt "wizard_button:nodux_account_ats.print_talon,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:nodux_account_ats.print_talon,start,print_:"
+msgid "Print"
+msgstr "Imprimir"
