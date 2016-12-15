@@ -112,7 +112,6 @@ class ATSStart(ModelView):
             for l in lines:
                 if i.move == l.move:
                     total_ventas_paid = total_ventas_paid + l.debit
-                    print total_ventas_paid
         for i2 in invoices_posted:
             for l2 in lines:
                 if i2.move == l2.move:
@@ -149,13 +148,11 @@ class ATSStart(ModelView):
         credits_all = Invoice.search([('type','=','out_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
         for m in move:
             invoices_a= Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('move', '=', m.id)])
-
             invoices_all.append(invoices_a)
 
         lines = MoveLine.search([('state', '=', 'valid')])
         total_ventas_paid = Decimal(0.0)
         total_paid = Decimal(0.0)
-        #print "Todas ", invoices_all
 
         for i_all in invoices_all:
             if i_all != []:
@@ -163,9 +160,7 @@ class ATSStart(ModelView):
                     for l in lines:
                         if i.move == l.move:
                             total_ventas_paid = total_ventas_paid + l.debit
-                        #print "Total paid ", total_ventas_paid
         total_ventas = total_ventas_paid
-        #print "Total ventas ", total_ventas, fiscalyear.start_date, period.start_date
         ats = etree.Element('iva')
         etree.SubElement(ats, 'TipoIDInformante').text = 'R'
         etree.SubElement(ats, 'IdInformante').text = id_informante
@@ -203,7 +198,6 @@ class ATSStart(ModelView):
                 else:
                     taxes3 = Taxes2I.search([('product','=', line.product.template)])
 
-                print "Los impuestos ", taxes1, taxes2, taxes3
                 if taxes1:
                     for t in taxes1:
                         if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -312,7 +306,7 @@ class ATSStart(ModelView):
             withholding = None
             if inv.ref_withholding:
                 Withholding = pool.get('account.withholding')
-                withholdings = Withholding.search([('number', '=', inv.ref_withholding)])
+                withholdings = Withholding.search([('number', '=', inv.ref_withholding), ('fisic', '=', False)])
                 for w in withholdings:
                     withholding = w
 
@@ -335,9 +329,9 @@ class ATSStart(ModelView):
                         etree.SubElement(detalleAir, 'anioUtDiv').text = '000' #pendiente
                 air.append(detalleAir)
                 detallecompras.append(air)
-                etree.SubElement(detallecompras, 'estabRetencion1').text = withholding.number_w[0:3]
-                etree.SubElement(detallecompras, 'ptoEmiRetencion1').text = withholding.number_w[4:7]
-                etree.SubElement(detallecompras, 'secRetencion1').text = withholding.number_w[8:16]
+                etree.SubElement(detallecompras, 'estabRetencion1').text = withholding.number[0:3]
+                etree.SubElement(detallecompras, 'ptoEmiRetencion1').text = withholding.number[4:7]
+                etree.SubElement(detallecompras, 'secRetencion1').text = withholding.number[8:16]
                 if withholding.numero_autorizacion:
                     etree.SubElement(detallecompras, 'autRetencion1').text = withholding.numero_autorizacion
                 etree.SubElement(detallecompras, 'fechaEmiRet1').text = withholding.withholding_date.strftime('%d/%m/%Y')
@@ -376,11 +370,9 @@ class ATSStart(ModelView):
                 cls.raise_user_error('No ha configurado el tipo de documento del tercero')
             etree.SubElement(detalleVentas, 'idCliente').text = party.vat_number
             etree.SubElement(detalleVentas, 'parteRelVtas').text = party.parte_relacional
-            print "tercero ", party.id, party.name
             invoices_a_p = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('party', '=',party.id), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
             if invoices_a_p != []:
                 invoices_all_party = invoices_a_p
-            print "Todas las Facturas ", invoices_all_party
             base = Decimal(0.0)
             mIva = Decimal(0.0)
             subtotal_v_0 = Decimal(0.0)
@@ -696,7 +688,6 @@ class ReportTalon(Report):
 
     @classmethod
     def parse(cls, report, objects, data, localcontext):
-        #print "Llega"
         Company = Pool().get('company.company')
         company_id = Transaction().context.get('company')
         company = Company(company_id)
@@ -705,7 +696,6 @@ class ReportTalon(Report):
             timezone = pytz.timezone(company.timezone)
             dt = datetime.now()
             hora = datetime.astimezone(dt.replace(tzinfo=pytz.utc), timezone)
-        #print "Pasa **",data
         localcontext['company'] = company
         localcontext['periodo'] = Period(data['fiscalyear'])
         localcontext['hora'] = hora.strftime('%H:%M:%S')
@@ -785,6 +775,5 @@ class ReportTalon(Report):
         localcontext['total_retenido'] = Decimal(0.0)
         localcontext['iva_retenido_venta'] = Decimal(0.0)
         localcontext['renta_retenido_venta'] = Decimal(0.0)
-        #print "localcontext", localcontext
 
         return super(ReportTalon, cls).parse(report, objects, data, localcontext)
