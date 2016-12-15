@@ -331,7 +331,7 @@ class ATSStart(ModelView):
                 detallecompras.append(air)
                 etree.SubElement(detallecompras, 'estabRetencion1').text = withholding.number[0:3]
                 etree.SubElement(detallecompras, 'ptoEmiRetencion1').text = withholding.number[4:7]
-                etree.SubElement(detallecompras, 'secRetencion1').text = withholding.number[8:16]
+                etree.SubElement(detallecompras, 'secRetencion1').text = withholding.number[8:17]
                 if withholding.numero_autorizacion:
                     etree.SubElement(detallecompras, 'autRetencion1').text = withholding.numero_autorizacion
                 etree.SubElement(detallecompras, 'fechaEmiRet1').text = withholding.withholding_date.strftime('%d/%m/%Y')
