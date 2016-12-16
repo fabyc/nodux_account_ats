@@ -180,8 +180,6 @@ class ATSStart(ModelView):
         Taxes1 = pool.get('product.category-customer-account.tax')
         Taxes2 = pool.get('product.template-customer-account.tax')
 
-
-
         for inv in invoices:
             subtotal14 = Decimal(0.0)
             subtotal0 = Decimal(0.0)
@@ -671,7 +669,6 @@ class PrintTalon(Wizard):
     print_ = StateAction('nodux_account_ats.report_talon')
 
     def do_print_(self, action):
-
         data = {
             'company': self.start.company.id,
             'fiscalyear' : self.start.fiscalyear.id,
@@ -692,29 +689,30 @@ class ReportTalon(Report):
         company_id = Transaction().context.get('company')
         company = Company(company_id)
         Period = Pool().get('account.period')
+        period = Period(data['periodo'])
         if company.timezone:
             timezone = pytz.timezone(company.timezone)
             dt = datetime.now()
             hora = datetime.astimezone(dt.replace(tzinfo=pytz.utc), timezone)
         localcontext['company'] = company
-        localcontext['periodo'] = Period(data['fiscalyear'])
+        localcontext['periodo'] = period
         localcontext['hora'] = hora.strftime('%H:%M:%S')
         localcontext['fecha'] = hora.strftime('%d/%m/%Y')
-        localcontext['no_fac_compras'] = Decimal(0.0)
-        localcontext['bi0_fac_compras'] = Decimal(0.0)
-        localcontext['bi12_fac_compras'] = Decimal(0.0)
+        localcontext['no_fac_compras'] = cls._get_no_fac_compras(Period, period)
+        localcontext['bi0_fac_compras'] = cls._get_bi0_fac_compras(Period, period)
+        localcontext['bi12_fac_compras'] = cls._get_bi12_fac_compras(Period, period)
         localcontext['noIva_fac_compras'] = Decimal(0.0)
-        localcontext['Iva_fac_compras'] = Decimal(0.0)
+        localcontext['Iva_fac_compras'] =  company.currency.round((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.14))
         localcontext['no_bol_compras'] = Decimal(0.0)
         localcontext['bi0_bol_compras'] = Decimal(0.0)
         localcontext['bi12_bol_compras'] = Decimal(0.0)
         localcontext['noIva_bol_compras'] = Decimal(0.0)
         localcontext['Iva_bol_compras'] = Decimal(0.0)
-        localcontext['no_nc_compras'] = Decimal(0.0)
-        localcontext['bi0_nc_compras'] = Decimal(0.0)
-        localcontext['bi12_nc_compras'] = Decimal(0.0)
+        localcontext['no_nc_compras'] = cls._get_no_nc_compras(Period, period)
+        localcontext['bi0_nc_compras'] = cls._get_bi0_nc_compras(Period, period)
+        localcontext['bi12_nc_compras'] = cls._get_bi12_nc_compras(Period, period)
         localcontext['noIva_nc_compras'] = Decimal(0.0)
-        localcontext['Iva_nc_compras'] = Decimal(0.0)
+        localcontext['Iva_nc_compras'] = company.currency.round((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.14))
         localcontext['no_cp_compras'] = Decimal(0.0)
         localcontext['bi0_cp_compras'] = Decimal(0.0)
         localcontext['bi12_cp_compras'] = Decimal(0.0)
@@ -725,55 +723,557 @@ class ReportTalon(Report):
         localcontext['bi12_estado_compras'] = Decimal(0.0)
         localcontext['noIva_estado_compras'] = Decimal(0.0)
         localcontext['Iva_estado_compras'] = Decimal(0.0)
-        localcontext['total_reg_compras'] = Decimal(0.0)
-        localcontext['total_bi0_compras'] = Decimal(0.0)
-        localcontext['total_bi12_compras'] = Decimal(0.0)
+        localcontext['total_reg_compras'] = cls._get_no_fac_compras(Period, period)+cls._get_no_nc_compras(Period, period)
+        localcontext['total_bi0_compras'] = cls._get_bi0_fac_compras(Period, period)+cls._get_bi0_nc_compras(Period, period)
+        localcontext['total_bi12_compras'] = cls._get_bi12_fac_compras(Period, period)+cls._get_bi12_nc_compras(Period, period)
         localcontext['total_noIva_compras'] = Decimal(0.0)
-        localcontext['total_iva_compras'] = Decimal(0.0)
-        localcontext['no_nc_ventas'] = Decimal(0.0)
-        localcontext['bi0_nc_ventas'] = Decimal(0.0)
-        localcontext['bi12_nc_ventas'] = Decimal(0.0)
+        localcontext['total_iva_compras'] = company.currency.round(((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.14))+((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.14)))
+        localcontext['no_nc_ventas'] = cls._get_no_nc_ventas(Period, period)
+        localcontext['bi0_nc_ventas'] = cls._get_bi0_nc_ventas(Period, period)
+        localcontext['bi12_nc_ventas'] = cls._get_bi12_nc_ventas(Period, period)
         localcontext['noIva_nc_ventas'] = Decimal(0.0)
-        localcontext['Iva_nc_ventas'] = Decimal(0.0)
-        localcontext['no_fac_ventas'] = Decimal(0.0)
-        localcontext['bi0_fac_ventas'] = Decimal(0.0)
-        localcontext['bi12_fac_ventas'] = Decimal(0.0)
+        localcontext['Iva_nc_ventas'] = company.currency.round(cls._get_bi12_nc_ventas(Period, period) * Decimal(0.14))
+        localcontext['no_fac_ventas'] = cls._get_no_fac_ventas(Period, period)
+        localcontext['bi0_fac_ventas'] = cls._get_bi0_fac_ventas(Period, period)
+        localcontext['bi12_fac_ventas'] = cls._get_bi12_fac_ventas(Period, period)
         localcontext['noIva_fac_ventas'] = Decimal(0.0)
-        localcontext['Iva_fac_ventas'] = Decimal(0.0)
-        localcontext['total_reg_ventas'] = Decimal(0.0)
-        localcontext['total_bi0_ventas'] = Decimal(0.0)
-        localcontext['total_bi12_ventas'] = Decimal(0.0)
+        localcontext['Iva_fac_ventas'] = company.currency.round(cls._get_bi12_fac_ventas(Period, period) * Decimal(0.14))
+        localcontext['total_reg_ventas'] = localcontext['no_nc_ventas'] + localcontext['no_fac_ventas']
+        localcontext['total_bi0_ventas'] = localcontext['bi0_nc_ventas'] + localcontext['bi0_fac_ventas']
+        localcontext['total_bi12_ventas'] = localcontext['bi12_nc_ventas'] + localcontext['bi12_fac_ventas']
         localcontext['total_noIva_ventas'] = Decimal(0.0)
-        localcontext['total_iva_ventas'] = Decimal(0.0)
-        localcontext['anulados'] = Decimal(0.0)
-        localcontext['no_303'] = Decimal(0.0)
-        localcontext['base_303'] = Decimal(0.0)
-        localcontext['retenido_303'] = Decimal(0.0)
-        localcontext['no_310'] = Decimal(0.0)
-        localcontext['base_310'] = Decimal(0.0)
-        localcontext['retenido_310'] = Decimal(0.0)
-        localcontext['no_312'] = Decimal(0.0)
-        localcontext['base_312'] = Decimal(0.0)
-        localcontext['retenido_312'] = Decimal(0.0)
-        localcontext['no_320'] = Decimal(0.0)
-        localcontext['base_320'] = Decimal(0.0)
-        localcontext['retenido_320'] = Decimal(0.0)
-        localcontext['no_342'] = Decimal(0.0)
-        localcontext['base_342'] = Decimal(0.0)
-        localcontext['retenido_342'] = Decimal(0.0)
-        localcontext['no_344'] = Decimal(0.0)
-        localcontext['base_344'] = Decimal(0.0)
-        localcontext['retenido_344'] = Decimal(0.0)
-        localcontext['no_retenciones'] = Decimal(0.0)
-        localcontext['base_retenciones'] = Decimal(0.0)
-        localcontext['retenido_retenciones'] = Decimal(0.0)
-        localcontext['retenido_10'] = Decimal(0.0)
-        localcontext['retenido_20'] = Decimal(0.0)
-        localcontext['retenido_30'] = Decimal(0.0)
-        localcontext['retenido_70'] = Decimal(0.0)
-        localcontext['retenido_100'] = Decimal(0.0)
-        localcontext['total_retenido'] = Decimal(0.0)
-        localcontext['iva_retenido_venta'] = Decimal(0.0)
-        localcontext['renta_retenido_venta'] = Decimal(0.0)
-
+        localcontext['total_iva_ventas'] = localcontext['Iva_nc_ventas'] + localcontext['Iva_fac_ventas']
+        localcontext['anulados'] = cls._get_anulados(Period, period)
+        localcontext['withholdings'] = cls._get_resumen_retencion_fuente(Period, period)
+        localcontext['no_retenciones'] = cls._get_no_retenciones(Period, period)
+        localcontext['base_retenciones'] = cls._get_base_retenciones(Period, period)
+        localcontext['retenido_retenciones'] = cls._get_retenido_retenciones(Period, period)
+        localcontext['retenido_10'] = cls._get_retenido_10(Period, period)
+        localcontext['retenido_20'] = cls._get_retenido_20(Period, period)
+        localcontext['retenido_30'] = cls._get_retenido_30(Period, period)
+        localcontext['retenido_70'] = cls._get_retenido_70(Period, period)
+        localcontext['retenido_100'] = cls._get_retenido_100(Period, period)
+        monto_retenido = localcontext['retenido_10']+ localcontext['retenido_20'] +localcontext['retenido_30']+localcontext['retenido_70']+localcontext['retenido_100']
+        localcontext['total_retenido'] = monto_retenido
+        localcontext['iva_retenido_venta'] = cls._get_iva_retenido_venta(Period, period)
+        localcontext['renta_retenido_venta'] =  cls._get_renta_retenido_venta(Period, period)
+        monto_retenido_venta = localcontext['iva_retenido_venta'] + localcontext['renta_retenido_venta']
+        localcontext['total_retenido_venta'] = monto_retenido_venta
         return super(ReportTalon, cls).parse(report, objects, data, localcontext)
+
+    @classmethod
+    def _get_no_fac_compras(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        no_fac_compras = 0
+        if invoices:
+            no_fac_compras = len(invoices)
+        return no_fac_compras
+
+    @classmethod
+    def _get_bi0_fac_compras(cls, Period, period):
+        bi0_fac_compras = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_compras= bi0_fac_compras + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_compras= bi0_fac_compras + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_compras= bi0_fac_compras + (line.amount)
+        return bi0_fac_compras
+
+    @classmethod
+    def _get_bi12_fac_compras(cls, Period, period):
+        bi12_fac_compras = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+        return bi12_fac_compras
+
+    @classmethod
+    def _get_no_nc_compras(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        no_nc_compras = 0
+        if invoices:
+            no_nc_compras = len(invoices)
+        return no_nc_compras
+
+    @classmethod
+    def _get_bi0_nc_compras(cls, Period, period):
+        bi0_nc_compras = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_nc_compras= bi0_nc_compras + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_nc_compras= bi0_nc_compras + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_nc_compras= bi0_nc_compras + (line.amount)
+        return bi0_nc_compras
+
+    @classmethod
+    def _get_bi12_nc_compras(cls, Period, period):
+        bi12_nc_compras = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_nc_compras= bi12_nc_compras + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_nc_compras= bi12_nc_compras + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_nc_compras= bi12_nc_compras + (line.amount)
+        return bi12_nc_compras
+
+    @classmethod
+    def _get_no_nc_ventas(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','out_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        no_nc_ventas = 0
+        if invoices:
+            no_nc_ventas = len(invoices)
+        return no_nc_ventas
+
+
+    @classmethod
+    def _get_bi0_nc_ventas(cls, Period, period):
+        bi0_nc_ventas = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','out_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_nc_ventas= bi0_nc_ventas + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_nc_ventas= bi0_nc_ventas + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_nc_ventas= bi0_nc_ventas + (line.amount)
+        return bi0_nc_ventas
+
+    @classmethod
+    def _get_bi12_nc_ventas(cls, Period, period):
+        bi12_nc_ventas = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','out_credit_note'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_nc_ventas= bi12_nc_ventas + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_nc_ventas= bi12_nc_ventas + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_nc_ventas= bi12_nc_ventas + (line.amount)
+        return bi12_nc_ventas
+
+    @classmethod
+    def _get_no_fac_ventas(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        no_fac_ventas = 0
+        if invoices:
+            no_fac_ventas = len(invoices)
+        return no_fac_ventas
+
+    @classmethod
+    def _get_bi0_fac_ventas(cls, Period, period):
+        bi0_fac_ventas = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_ventas= bi0_fac_ventas + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_ventas= bi0_fac_ventas + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_ventas= bi0_fac_ventas + (line.amount)
+        return bi0_fac_ventas
+
+    @classmethod
+    def _get_bi12_fac_ventas(cls, Period, period):
+        bi12_fac_ventas = Decimal(0.00)
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_ventas= bi12_fac_ventas + (line.amount)
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_ventas= bi12_fac_ventas + (line.amount)
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_ventas= bi12_fac_ventas + (line.amount)
+        return bi12_fac_ventas
+
+    @classmethod
+    def _get_anulados(cls, Period, period):
+        anulados = 0
+        pool = Pool()
+        Taxes1 = pool.get('product.category-customer-account.tax')
+        Taxes2 = pool.get('product.template-customer-account.tax')
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','out_invoice'), ('state','=', 'annulled'), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        if invoices:
+            anulados = lens(invoices)
+        return anulados
+
+    @classmethod
+    def _get_resumen_retencion_fuente(cls, Period, period):
+        resumen_retencion_fuente = []
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state', '!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+        taxes = []
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tipo == 'RENTA':
+                    if w_taxes.description in taxes:
+                        pass
+                    else:
+                        taxes.append(w_taxes.description)
+
+        for tax in taxes:
+            lineas = {}
+            base = Decimal(0.0)
+            retenido = Decimal(0.0)
+            cont = 0
+
+            for withholding in withholdings:
+                for w_taxes in withholding.taxes:
+                    if w_taxes.description == tax:
+                        code = w_taxes.tax.code_electronic.code
+                        base += w_taxes.base
+                        retenido += w_taxes.amount * (-1)
+                        cont += 1
+
+            lineas['code'] = code
+            lineas['description'] = tax
+            lineas['nro_registros'] = cont
+            lineas['base'] = base
+            lineas['retenido'] = retenido
+
+            resumen_retencion_fuente.append(lineas)
+        return resumen_retencion_fuente
+
+    @classmethod
+    def _get_no_retenciones(cls, Period, period):
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state', '!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+        taxes = []
+        no_retenciones = 0
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tipo == 'RENTA':
+                    if w_taxes.description in taxes:
+                        pass
+                    else:
+                        taxes.append(w_taxes.description)
+
+        for tax in taxes:
+            cont = 0
+            for withholding in withholdings:
+                for w_taxes in withholding.taxes:
+                    code = w_taxes.tax.code_electronic.code
+                    if w_taxes.description == tax:
+                        cont += 1
+            no_retenciones += cont
+        return no_retenciones
+
+    @classmethod
+    def _get_base_retenciones(cls, Period, period):
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state', '!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+        base = 0
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tipo == 'RENTA':
+                    base += w_taxes.base
+
+        return base
+
+    @classmethod
+    def _get_retenido_retenciones(cls, Period, period):
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state', '!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+        retenido = 0
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tipo == 'RENTA':
+                    retenido += (w_taxes.amount * (-1))
+
+        return retenido
+
+    @classmethod
+    def _get_retenido_10(cls, Period, period):
+        retenido_10 = Decimal(0.0)
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state','!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tax.code_electronic.code == '9':
+                    retenido_10 = w_taxes.amount * (-1)
+        return retenido_10
+
+    @classmethod
+    def _get_retenido_20(cls, Period, period):
+        retenido_20 = Decimal(0.0)
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state','!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tax.code_electronic.code == '10':
+                    retenido_20 = w_taxes.amount * (-1)
+        return retenido_20
+
+    @classmethod
+    def _get_retenido_30(cls, Period, period):
+        retenido_30 = Decimal(0.0)
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state','!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tax.code_electronic.code == '1':
+                    retenido_30 = w_taxes.amount * (-1)
+        return retenido_30
+
+    @classmethod
+    def _get_retenido_70(cls, Period, period):
+        retenido_70 = Decimal(0.0)
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state','!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tax.code_electronic.code == '2':
+                    retenido_70 = w_taxes.amount * (-1)
+        return retenido_70
+
+    @classmethod
+    def _get_retenido_100(cls, Period, period):
+        retenido_100 = Decimal(0.0)
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','in_withholding'), ('state','!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if w_taxes.tax.code_electronic.code == '3':
+                    retenido_100 = w_taxes.amount * (-1)
+        return retenido_100
+
+    @classmethod
+    def _get_iva_retenido_venta(cls, Period, period):
+        iva_retenido_venta = Decimal(0.0)
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','out_withholding'), ('state','!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if (w_taxes.tipo == 'IVA') | (w_taxes.tax.code_withholding == '2'):
+                    iva_retenido_venta += (w_taxes.amount * (-1))
+        return iva_retenido_venta
+
+    @classmethod
+    def _get_renta_retenido_venta(cls, Period, period):
+        renta_retenido_venta = Decimal(0.0)
+        pool = Pool()
+        Withholding = pool.get('account.withholding')
+        withholdings = Withholding.search([('type','=','out_withholding'), ('state','!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+
+        for withholding in withholdings:
+            for w_taxes in withholding.taxes:
+                if (w_taxes.tipo == 'RENTA') | (w_taxes.tax.code_withholding == '1'):
+                    renta_retenido_venta += (w_taxes.amount * (-1))
+        return renta_retenido_venta
