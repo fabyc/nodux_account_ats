@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 from decimal import Decimal
@@ -747,6 +749,9 @@ class ReportTalon(Report):
         localcontext['withholdings'] = cls._get_resumen_retencion_fuente(Period, period)
         localcontext['no_retenciones'] = cls._get_no_retenciones(Period, period)
         localcontext['base_retenciones'] = cls._get_base_retenciones(Period, period)
+        localcontext['no_withholdings'] = cls._get_resumen_no_retencion_fuente(Period, period)
+        localcontext['no_genera_retenciones'] = cls._get_no_genera_retenciones(Period, period)
+        localcontext['base_no_retenciones'] = cls._get_base_no_retenciones(Period, period)
         localcontext['retenido_retenciones'] = cls._get_retenido_retenciones(Period, period)
         localcontext['retenido_10'] = cls._get_retenido_10(Period, period)
         localcontext['retenido_20'] = cls._get_retenido_20(Period, period)
@@ -765,11 +770,9 @@ class ReportTalon(Report):
     def _get_no_fac_compras(cls, Period, period):
         pool = Pool()
         Invoice = pool.get('account.invoice')
-        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
-        no_fac_compras = 0
-        if invoices:
-            no_fac_compras = len(invoices)
-        return no_fac_compras
+        invoices = Invoice.search_count([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+
+        return invoices
 
     @classmethod
     def _get_bi0_fac_compras(cls, Period, period):
@@ -810,8 +813,8 @@ class ReportTalon(Report):
     def _get_bi12_fac_compras(cls, Period, period):
         bi12_fac_compras = Decimal(0.00)
         pool = Pool()
-        Taxes1 = pool.get('product.category-customer-account.tax')
-        Taxes2 = pool.get('product.template-customer-account.tax')
+        Taxes1 = pool.get('product.category-supplier-account.tax')
+        Taxes2 = pool.get('product.template-supplier-account.tax')
         Invoice = pool.get('account.invoice')
         invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
         if invoices:
@@ -826,18 +829,25 @@ class ReportTalon(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
+
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_compras= bi12_fac_compras + (line.amount)
                     elif taxes2:
                         for t in taxes2:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '14':
                                 bi12_fac_compras= bi12_fac_compras + (line.amount)
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
                     elif taxes3:
                         for t in taxes3:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_compras= bi12_fac_compras + (line.amount)
         return bi12_fac_compras
 
@@ -1132,6 +1142,47 @@ class ReportTalon(Report):
 
             resumen_retencion_fuente.append(lineas)
         return resumen_retencion_fuente
+
+    @classmethod
+    def _get_resumen_no_retencion_fuente(cls, Period, period):
+        resumen_no_retencion_fuente = []
+        base = Decimal(0.0)
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state', '!=', 'draft'), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('no_generate_withholding', '=', True)])
+
+        for invoice in invoices:
+            base += invoice.untaxed_amount
+
+        lineas = {}
+        lineas['code'] = 332
+        lineas['description'] = u'OTRAS COMPRAS DE BIENES Y SERVICIOS NO SUJETAS A RETENCIÓN (332)'
+        lineas['nro_registros'] = len(invoices)
+        lineas['base'] = base
+        lineas['retenido'] = Decimal(0.0)
+
+        resumen_no_retencion_fuente.append(lineas)
+        return resumen_no_retencion_fuente
+
+    @classmethod
+    def _get_no_genera_retenciones(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state', '!=', 'draft'), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('no_generate_withholding', '=', True)])
+
+        return len(invoices)
+
+
+    @classmethod
+    def _get_base_no_retenciones(cls, Period, period):
+        base = Decimal(0.0)
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state', '!=', 'draft'), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('no_generate_withholding', '=', True)])
+
+        for invoice in invoices:
+            base += invoice.untaxed_amount
+        return base
 
     @classmethod
     def _get_no_retenciones(cls, Period, period):
