@@ -162,6 +162,7 @@ class ATSStart(ModelView):
                     for l in lines:
                         if i.move == l.move:
                             total_ventas_paid = total_ventas_paid + l.debit
+
         total_ventas = total_ventas_paid
         ats = etree.Element('iva')
         etree.SubElement(ats, 'TipoIDInformante').text = 'R'
@@ -171,7 +172,7 @@ class ATSStart(ModelView):
         etree.SubElement(ats, 'Mes').text = period.start_date.strftime('%m')
         #numero de establecimientos del emisor->entero
         etree.SubElement(ats, 'numEstabRuc').text = '001'
-        etree.SubElement(ats, 'totalVentas').text = '0.00'
+        etree.SubElement(ats, 'totalVentas').text =  '%.2f'%total_ventas
         etree.SubElement(ats, 'codigoOperativo').text = 'IVA'
         compras = etree.Element('compras')
 
@@ -261,16 +262,19 @@ class ATSStart(ModelView):
                 withholdings_iva = Withholding_iva.search([('number', '=', inv.ref_withholding), ('fisic', '=', False)])
                 for w_iva in withholdings_iva:
                     for w_taxes in w_iva.taxes:
-                        if w_taxes.tax.code_electronic.code == '9':
-                            valRetBien10 = w_taxes.amount * (-1)
-                        if w_taxes.tax.code_electronic.code == '10':
-                            valRetServ20 = w_taxes.amount * (-1)
-                        if w_taxes.tax.code_electronic.code == '1':
-                            valorRetBienes = w_taxes.amount * (-1)
-                        if w_taxes.tax.code_electronic.code == '2':
-                            valorRetServicios = w_taxes.amount * (-1)
-                        if w_taxes.tax.code_electronic.code == '3':
-                            valRetServ100 = w_taxes.amount * (-1)
+                        if w_taxes.tax.code_electronic:
+                            if w_taxes.tax.code_electronic.code == '9':
+                                valRetBien10 = w_taxes.amount * (-1)
+                            if w_taxes.tax.code_electronic.code == '10':
+                                valRetServ20 = w_taxes.amount * (-1)
+                            if w_taxes.tax.code_electronic.code == '1':
+                                valorRetBienes = w_taxes.amount * (-1)
+                            if w_taxes.tax.code_electronic.code == '2':
+                                valorRetServicios = w_taxes.amount * (-1)
+                            if w_taxes.tax.code_electronic.code == '3':
+                                valRetServ100 = w_taxes.amount * (-1)
+                        else:
+                            self.raise_user_error('Configure el codigo del impuesto%s', w_taxes.description)
 
             etree.SubElement(detallecompras, 'valRetBien10').text = '%.2f'%valRetBien10
             etree.SubElement(detallecompras, 'valRetServ20').text =  '%.2f'%valRetServ20
@@ -549,7 +553,7 @@ class ATSStart(ModelView):
         ventasEstablecimiento = etree.Element('ventasEstablecimiento')
         ventaEst = etree.Element('ventaEst')
         etree.SubElement(ventaEst, 'codEstab').text = '001'
-        etree.SubElement(ventaEst, 'ventasEstab').text = '0.00'
+        etree.SubElement(ventaEst, 'ventasEstab').text = '%.2f'%total_ventas
         etree.SubElement(ventaEst, 'ivaComp').text = '0.00'
         ventasEstablecimiento.append(ventaEst)
         ats.append(ventasEstablecimiento)
@@ -1129,7 +1133,10 @@ class ReportTalon(Report):
             for withholding in withholdings:
                 for w_taxes in withholding.taxes:
                     if w_taxes.description == tax:
-                        code = w_taxes.tax.code_electronic.code
+                        if w_taxes.tax.code_electronic:
+                            code = w_taxes.tax.code_electronic.code
+                        else:
+                            withholding.raise_user_error("Configure el codigo del impuesto \n%s", w_taxes.description)
                         base += w_taxes.base
                         retenido += w_taxes.amount * (-1)
                         cont += 1
@@ -1204,7 +1211,6 @@ class ReportTalon(Report):
             cont = 0
             for withholding in withholdings:
                 for w_taxes in withholding.taxes:
-                    code = w_taxes.tax.code_electronic.code
                     if w_taxes.description == tax:
                         cont += 1
             no_retenciones += cont
@@ -1247,8 +1253,11 @@ class ReportTalon(Report):
 
         for withholding in withholdings:
             for w_taxes in withholding.taxes:
-                if w_taxes.tax.code_electronic.code == '9':
-                    retenido_10 = w_taxes.amount * (-1)
+                if w_taxes.tax.code_electronic:
+                    if w_taxes.tax.code_electronic.code == '9':
+                        retenido_10 = w_taxes.amount * (-1)
+                else:
+                    withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_10
 
     @classmethod
@@ -1260,8 +1269,11 @@ class ReportTalon(Report):
 
         for withholding in withholdings:
             for w_taxes in withholding.taxes:
-                if w_taxes.tax.code_electronic.code == '10':
-                    retenido_20 = w_taxes.amount * (-1)
+                if w_taxes.tax.code_electronic:
+                    if w_taxes.tax.code_electronic.code == '10':
+                        retenido_20 = w_taxes.amount * (-1)
+                else:
+                    withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_20
 
     @classmethod
@@ -1273,8 +1285,11 @@ class ReportTalon(Report):
 
         for withholding in withholdings:
             for w_taxes in withholding.taxes:
-                if w_taxes.tax.code_electronic.code == '1':
-                    retenido_30 = w_taxes.amount * (-1)
+                if w_taxes.tax.code_electronic:
+                    if w_taxes.tax.code_electronic.code == '1':
+                        retenido_30 = w_taxes.amount * (-1)
+                else:
+                    withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_30
 
     @classmethod
@@ -1286,8 +1301,11 @@ class ReportTalon(Report):
 
         for withholding in withholdings:
             for w_taxes in withholding.taxes:
-                if w_taxes.tax.code_electronic.code == '2':
-                    retenido_70 = w_taxes.amount * (-1)
+                if w_taxes.tax.code_electronic:
+                    if w_taxes.tax.code_electronic.code == '2':
+                        retenido_70 = w_taxes.amount * (-1)
+                else:
+                    withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_70
 
     @classmethod
@@ -1299,8 +1317,12 @@ class ReportTalon(Report):
 
         for withholding in withholdings:
             for w_taxes in withholding.taxes:
-                if w_taxes.tax.code_electronic.code == '3':
-                    retenido_100 = w_taxes.amount * (-1)
+                if w_taxes.tax.code_electronic:
+                    if w_taxes.tax.code_electronic.code == '3':
+                        retenido_100 = w_taxes.amount * (-1)
+                else:
+                    withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
+
         return retenido_100
 
     @classmethod
