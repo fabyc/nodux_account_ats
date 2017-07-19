@@ -2,38 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "field:account.formas_pago,code:"
-msgid "Codigo"
-msgstr ""
-
-msgctxt "field:account.formas_pago,create_date:"
-msgid "Create Date"
-msgstr "Fecha de Creación"
-
-msgctxt "field:account.formas_pago,create_uid:"
-msgid "Create User"
-msgstr "Usuario creación"
-
-msgctxt "field:account.formas_pago,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:account.formas_pago,name:"
-msgid "Forma de pago"
-msgstr ""
-
-msgctxt "field:account.formas_pago,rec_name:"
-msgid "Name"
-msgstr "Nombre"
-
-msgctxt "field:account.formas_pago,write_date:"
-msgid "Write Date"
-msgstr "Modificado por usuario"
-
-msgctxt "field:account.formas_pago,write_uid:"
-msgid "Write User"
-msgstr "Usuario modificación"
-
 msgctxt "field:account.invoice,exclude_ats:"
 msgid "Not include in ATS"
 msgstr "No incluir en ATS"
@@ -41,10 +9,6 @@ msgstr "No incluir en ATS"
 msgctxt "field:account.invoice,fecha_autorizacion:"
 msgid "Fecha de autorizacion"
 msgstr "Fecha de autorización"
-
-msgctxt "field:account.invoice,numero_autorizacion:"
-msgid "Número de Autorización"
-msgstr "Número de autorización"
 
 msgctxt "field:account.invoice,numero_autorizacion_invoice:"
 msgid "Número de autorización"
@@ -82,6 +46,78 @@ msgctxt "field:account.sustento,write_uid:"
 msgid "Write User"
 msgstr "Modificado por Usuario"
 
+msgctxt "field:account.tax,code_electronic:"
+msgid "Codigo para Retencion-Comprobantes Electronicos"
+msgstr ""
+
+msgctxt "field:account.tax,code_withholding:"
+msgid "Impuesto asignado para la retencion"
+msgstr ""
+
+msgctxt "field:account.tax.electronic,code:"
+msgid "Codigo"
+msgstr ""
+
+msgctxt "field:account.tax.electronic,create_date:"
+msgid "Create Date"
+msgstr "Fecha de Creación"
+
+msgctxt "field:account.tax.electronic,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:account.tax.electronic,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:account.tax.electronic,name:"
+msgid "Concepto Retencion"
+msgstr ""
+
+msgctxt "field:account.tax.electronic,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:account.tax.electronic,write_date:"
+msgid "Write Date"
+msgstr "Modificado por usuario"
+
+msgctxt "field:account.tax.electronic,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+msgctxt "field:account.tax.special,code:"
+msgid "Codigo"
+msgstr ""
+
+msgctxt "field:account.tax.special,create_date:"
+msgid "Create Date"
+msgstr "Fecha de Creación"
+
+msgctxt "field:account.tax.special,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:account.tax.special,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:account.tax.special,name:"
+msgid "Concepto Impuesto Consumos Especiales"
+msgstr ""
+
+msgctxt "field:account.tax.special,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:account.tax.special,write_date:"
+msgid "Write Date"
+msgstr "Modificado por usuario"
+
+msgctxt "field:account.tax.special,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
 msgctxt "field:nodux_account_ats.ats.export.result,file:"
 msgid "File"
 msgstr "Archivo"
@@ -99,6 +135,22 @@ msgid "ID"
 msgstr "ID"
 
 msgctxt "field:nodux_account_ats.print_ats.start,periodo:"
+msgid "Period"
+msgstr "Período"
+
+msgctxt "field:nodux_account_ats.print_sumary_purchases.start,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:nodux_account_ats.print_sumary_purchases.start,fiscalyear:"
+msgid "Fiscal Year"
+msgstr "Año Fiscal"
+
+msgctxt "field:nodux_account_ats.print_sumary_purchases.start,id:"
+msgid "ID"
+msgstr "Identificador"
+
+msgctxt "field:nodux_account_ats.print_sumary_purchases.start,periodo:"
 msgid "Period"
 msgstr "Período"
 
@@ -162,6 +214,15 @@ msgctxt "field:party.party,type_document:"
 msgid "Type Document"
 msgstr "Tipo de documento"
 
+msgctxt "help:account.tax,code_electronic:"
+msgid ""
+"Seleccionar el codigo por impuesto de acuerdo al porcentaje de retencion"
+msgstr ""
+
+msgctxt "help:account.tax,code_withholding:"
+msgid "Seleccionar el codigo de impuesto asignados para la retencion"
+msgstr ""
+
 msgctxt "help:party.party,convenio_doble:"
 msgid "Aplica convenio de doble tributacion"
 msgstr "Convenio de doble Tributación"
@@ -176,10 +237,6 @@ msgstr ""
 
 msgctxt "help:party.party,tipo_proveedor:"
 msgid "Tipo de identificacion del Proveedor"
-msgstr ""
-
-msgctxt "model:account.formas_pago,name:"
-msgid "Forma Pago"
 msgstr ""
 
 msgctxt "model:account.sustento,name:"
@@ -252,6 +309,768 @@ msgctxt "model:account.sustento,name:ate_9"
 msgid "Reembolso por Siniestros"
 msgstr "Reembolso por Siniestros"
 
+msgctxt "model:account.tax.electronic,name:"
+msgid "Tax Electronic"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate1"
+msgid "RETENCION DE IVA 10%"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate10"
+msgid ""
+"Servicios predomina el intelecto no relacionados con el título profesional"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate100"
+msgid "Pago al exterior - Servicios profesionales independientes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate101"
+msgid "Pago al exterior - Servicios profesionales dependientes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate102"
+msgid "Pago al exterior - Artistas"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate103"
+msgid "Pago al exterior - Deportistas"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate104"
+msgid "Pago al exterior - Participación de consejeros"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate105"
+msgid "Pago al exterior - Entretenimiento Público"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate106"
+msgid "Pago al exterior - Pensiones"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate107"
+msgid "Pago al exterior - Reembolso de Gastos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate108"
+msgid "Pago al exterior - Funciones Públicas"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate109"
+msgid "Pago al exterior - Estudiantes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate11"
+msgid ""
+"Comisiones y demás pagos por servicios predomina intelecto no relacionados "
+"con el título profesional"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate110"
+msgid "Pago al exterior - Otros conceptos de ingresos gravados"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate111"
+msgid ""
+"Pago al exterior - Pago a proveedores de servicios hoteleros y turísticos en"
+" el exterior"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate112"
+msgid "Pago al exterior - Arrendamientos mercantil internacional"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate113"
+msgid ""
+"Pago al exterior - Comisiones por exportaciones y por promoción de turismo "
+"receptivo"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate114"
+msgid ""
+"Pago al exterior - Por las empresas de transporte marítimo o aéreo y por empresas pesqueras de alta mar, por su\n"
+"actividad."
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate115"
+msgid "Pago al exterior - Por las agencias internacionales de prensa"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate116"
+msgid ""
+"Pago al exterior - Contratos de fletamento de naves para empresas de "
+"transporte aéreo o marítimo internacional"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate117"
+msgid ""
+"Pago al exterior - Enajenación de derechos representativos de capital y "
+"otros derechos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate118"
+msgid ""
+"Pago al exterior - Servicios técnicos, administrativos o de consultoría y "
+"regalías con convenio de doble tributación"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate119"
+msgid ""
+"Pago al exterior - Servicios técnicos, administrativos o de consultoría y "
+"regalías sin convenio de doble tributación"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate12"
+msgid ""
+"Pagos a notarios y registradores de la propiedad y mercantil por sus "
+"actividades ejercidas como tales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate120"
+msgid ""
+"Pago al exterior - Servicios técnicos, administrativos o de consultoría y "
+"regalías en paraísos fiscales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate121"
+msgid ""
+"Pago al exterior - Seguros y reaseguros (primas y cesiones) con convenio de "
+"doble tributación"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate122"
+msgid ""
+"Pago al exterior - Seguros y reaseguros (primas y cesiones) sin convenio de "
+"doble tributación"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate123"
+msgid ""
+"Pago al exterior - Seguros y reaseguros (primas y cesiones) en paraísos "
+"fiscales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate124"
+msgid "Transporte público de pasajeros"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate125"
+msgid ""
+"Impuesto único a la exportación de banano de producción propia - componente "
+"1"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate13"
+msgid ""
+"Pagos a deportistas, entrenadores, árbitros, miembros del cuerpo técnico por sus actividades ejercidas como\n"
+"tales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate14"
+msgid "Pagos a artistas por sus actividades ejercidas como tales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate15"
+msgid "Honorarios y demás pagos por servicios de docencia"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate16"
+msgid "Servicios predomina la mano de obra"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate17"
+msgid "Utilización o aprovechamiento de la imagen o renombre"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate18"
+msgid ""
+"Servicios prestados por medios de comunicación y agencias de publicidad"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate19"
+msgid ""
+"Servicio de transporte privado de pasajeros o transporte público o privado "
+"de carga"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate2"
+msgid "RETENCION DE IVA 20%"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate20"
+msgid ""
+"Por pagos a través de liquidación de compra (nivel cultural o rusticidad)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate21"
+msgid "Transferencia de bienes muebles de naturaleza corporal"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate22"
+msgid ""
+"Compra de bienes de origen agrícola, avícola, pecuario, apícola, cunícula, "
+"bioacuático, y forestal"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate23"
+msgid ""
+"Regalías por concepto de franquicias de acuerdo a Ley de Propiedad "
+"Intelectual - pago a personas naturales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate24"
+msgid ""
+"Cánones, derechos de autor, marcas, patentes y similares de acuerdo a Ley de Propiedad Intelectual – pago a\n"
+"personas naturales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate25"
+msgid ""
+"Regalías por concepto de franquicias de acuerdo a Ley de Propiedad "
+"Intelectual - pago a sociedades"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate26"
+msgid ""
+"Cánones, derechos de autor, marcas, patentes y similares de acuerdo a Ley de Propiedad Intelectual – pago a\n"
+"sociedades"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate27"
+msgid "Cuotas de arrendamiento mercantil, inclusive la de opción de compra"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate28"
+msgid "Por arrendamiento bienes inmuebles"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate29"
+msgid "Seguros y reaseguros (primas y cesiones)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate3"
+msgid "RETENCION DE IVA 30%"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate30"
+msgid ""
+"Por rendimientos financieros pagados a naturales y sociedades (No a IFIs)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate31"
+msgid "Por RF: depósitos Cta. Corriente"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate32"
+msgid "Por RF: depósitos Cta. Ahorros Sociedades"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate33"
+msgid "Por RF: depósito a plazo fijo gravados"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate34"
+msgid "Por RF: depósito a plazo fijo exentos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate35"
+msgid "Por rendimientos financieros: operaciones de reporto - repos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate36"
+msgid ""
+"Por RF: inversiones (captaciones) rendimientos distintos de aquellos pagados"
+" a IFIs"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate37"
+msgid "Por RF: obligaciones"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate38"
+msgid "Por RF: bonos convertible en acciones"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate39"
+msgid "Por RF: Inversiones en títulos valores en renta fija gravados"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate4"
+msgid "RETENCION DE IVA 70%"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate40"
+msgid "Por RF: Inversiones en títulos valores en renta fija exentos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate41"
+msgid ""
+"Por RF: Intereses pagados a bancos y otras entidades sometidas al control de la Superintendencia de Bancos y\n"
+"de la Economía Popular y Solidaria"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate42"
+msgid ""
+"Por RF: Intereses pagados por entidades del sector público a favor de "
+"sujetos pasivos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate43"
+msgid "Por RF: Otros intereses y rendimientos financieros gravados"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate44"
+msgid "Por RF: Otros intereses y rendimientos financieros exentos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate45"
+msgid ""
+"Por RF: Intereses en operaciones de crédito entre instituciones del sistema financiero y entidades economía\n"
+"popular y solidaria."
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate46"
+msgid ""
+"Por RF: Por inversiones entre instituciones del sistema financiero y "
+"entidades economía popular y solidaria."
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate47"
+msgid "Anticipo dividendos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate48"
+msgid ""
+"Dividendos anticipados préstamos accionistas, beneficiarios o partìcipes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate49"
+msgid ""
+"Dividendos distribuidos que correspondan al impuesto a la renta único "
+"establecido en el art. 27 de la lrti"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate5"
+msgid "RETENCION DE IVA 100%"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate50"
+msgid "Dividendos distribuidos a personas naturales residentes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate51"
+msgid "Dividendos distribuidos a sociedades residentes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate52"
+msgid "Dividendos distribuidos a fideicomisos residentes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate53"
+msgid ""
+"Dividendos gravados distribuidos en acciones (reinversión de utilidades sin "
+"derecho a reducción tarifa IR)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate54"
+msgid ""
+"Dividendos exentos distribuidos en acciones (reinversión de utilidades con "
+"derecho a reducción tarifa IR)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate55"
+msgid "Otras compras de bienes y servicios no sujetas a retención"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate56"
+msgid ""
+"Por la enajenación ocasional de acciones o participaciones y títulos valores"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate57"
+msgid "Compra de bienes inmuebles"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate58"
+msgid ""
+"Pagos en el país por transporte de pasajeros o transporte internacional de carga, a compañías nacionales o\n"
+"extranjeras de aviación o marítimas"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate59"
+msgid "Valores entregados por las cooperativas de transporte a sus socios"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate6"
+msgid "RETENCION DE IVA 0%"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate60"
+msgid ""
+"Compraventa de divisas distintas al dólar de los Estados Unidos de América"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate61"
+msgid "Pagos con tarjeta de crédito"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate62"
+msgid ""
+"Pago al exterior tarjeta de crédito reportada por la Emisora de tarjeta de "
+"crédito, solo recap"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate63"
+msgid ""
+"Enajenación de derechos representativos de capital y otros derechos "
+"cotizados en bolsa ecuatoriana"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate64"
+msgid ""
+"Enajenación de derechos representativos de capital y otros derechos no "
+"cotizados en bolsa ecuatoriana"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate65"
+msgid "Por loterías, rifas, apuestas y similares"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate66"
+msgid "Por venta de combustibles a comercializadoras"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate67"
+msgid "Por venta de combustibles a distribuidores"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate68"
+msgid "Compra local de banano a productor"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate69"
+msgid ""
+"Liquidación impuesto único a la venta local de banano de producción propia"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate7"
+msgid "NO PROCEDE RETENCION"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate70"
+msgid ""
+"Impuesto único a la exportación de banano de producción propia - componente "
+"2"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate71"
+msgid "Impuesto único a la exportación de banano producido por terceros"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate72"
+msgid "Por energía eléctrica"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate73"
+msgid ""
+"Por actividades de construcción de obra material inmueble, urbanización, "
+"lotización o actividades similares"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate74"
+msgid "Otras retenciones aplicables el 2%"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate75"
+msgid ""
+"Pago local tarjeta de crédito reportada por la Emisora de tarjeta de "
+"crédito, solo recap"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate76"
+msgid "Ganancias de capital"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate77"
+msgid "Pago al exterior - Rentas Inmobiliarias"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate78"
+msgid "Pago al exterior - Beneficios Empresariales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate79"
+msgid "Pago al exterior - Servicios Empresariales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate8"
+msgid "RETENCION ISD"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate80"
+msgid "Pago al exterior - Navegación Marítima y/o aérea"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate81"
+msgid "Pago al exterior- Dividendos distribuidos a personas naturales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate82"
+msgid "Pago al exterior - Dividendos a sociedades"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate83"
+msgid "Pago al exterior - Dividendos a sociedades"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate84"
+msgid ""
+"Pago al exterior - Dividendos anticipados préstamos accionistas, "
+"beneficiarios o partìcipes"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate85"
+msgid "Pago al exterior - Dividendos a fideicomisos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate86"
+msgid ""
+"Pago al exterior- Dividendos distribuidos a personas naturales (paraísos "
+"fiscales)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate87"
+msgid "Pago al exterior - Dividendos a sociedades (paraísos fiscales)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate88"
+msgid "Pago al exterior - Anticipo dividendos (paraísos fiscales)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate89"
+msgid "Pago al exterior - Dividendos a fideicomisos (paraísos fiscales)"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate9"
+msgid ""
+"Honorarios profesionales y demás pagos por servicios relacionados con el "
+"título profesional"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate90"
+msgid "Pago al exterior - Rendimientos financieros"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate91"
+msgid ""
+"Pago al exterior – Intereses de créditos de Instituciones Financieras del "
+"exterior"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate92"
+msgid "Pago al exterior – Intereses de créditos de gobierno a gobierno"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate93"
+msgid "Pago al exterior – Intereses de créditos de organismos multilaterales"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate94"
+msgid ""
+"Pago al exterior - Intereses por financiamiento de proveedores externos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate95"
+msgid "Pago al exterior - Intereses de otros créditos externos"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate96"
+msgid "Pago al exterior - Otros Intereses y Rendimientos Financieros"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate97"
+msgid ""
+"Pago al exterior - Cánones, derechos de autor, marcas, patentes y similares"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate98"
+msgid "Pago al exterior - Regalías por concepto de franquicias"
+msgstr ""
+
+msgctxt "model:account.tax.electronic,name:ate99"
+msgid "Pago al exterior - Ganancias de capital"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:"
+msgid "Impuesto a los Consumos especiales"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_1"
+msgid "Bebidas gaseosas"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_10"
+msgid ""
+"Vehículos motorizados, excepto camionetas, furgonetas, camiones y vehículos "
+"de rescate, cuyo precio de venta al público sea superior a USD 20.000 y de "
+"hasta USD 30.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_11"
+msgid ""
+"Vehículos motorizados, cuyo precio de venta al público sea superior a USD "
+"30.000 y de hasta USD 40.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_12"
+msgid ""
+"Vehículos motorizados, cuyo precio de venta al público sea superior a USD "
+"40.000 y de hasta USD 50.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_13"
+msgid ""
+"Vehículos motorizados cuyo precio de venta al público sea superior a USD "
+"50.000 y de hasta USD 60.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_14"
+msgid ""
+"Vehículos motorizados cuyo precio de venta al público sea superior a USD "
+"60.000 y de hasta USD 70.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_15"
+msgid ""
+"Vehículos motorizados cuyo precio de venta al público sea superior a USD "
+"70.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_16"
+msgid ""
+"Vehículos híbridos o eléctricos cuyo precio de venta al público sea de hasta"
+" USD 35.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_17"
+msgid ""
+"Vehículos híbridos o eléctricos cuyo precio de venta al público sea superior"
+" a USD 35.000 y de hasta USD 40.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_18"
+msgid ""
+"Vehículos híbridos o eléctricos cuyo precio de venta al público sea superior"
+" a USD 40.000 y de hasta USD 50.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_19"
+msgid ""
+"Vehículos híbridos o eléctricos cuyo precio de venta al público sea superior"
+" a USD 50.000 y de hasta USD 60.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_2"
+msgid "Perfumes y aguas de tocador"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_20"
+msgid ""
+"Vehículos híbridos o eléctricos cuyo precio de venta al público sea superior"
+" a USD 60.000 y de hasta USD 70.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_21"
+msgid ""
+"Vehículos híbridos o eléctricos cuyo precio de venta al público sea superior"
+" a USD 70.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_22"
+msgid ""
+"Aviones, avionetas y helicópteros excepto aquellas destinadas al transporte "
+"comercial de pasajeros, carga y servicios; motos acuáticas, tricares, "
+"cuadrones, yates y barcos de recreo"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_23"
+msgid "Servicios de televisión pagada"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_24"
+msgid ""
+"Servicios de casinos, salas de juego (bingo - mecánicos) y otros juegos de "
+"azar"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_25"
+msgid ""
+"Las cuotas, membresías, afiliaciones, acciones y similares que cobren a sus "
+"miembros y usuarios los Clubes Sociales, para prestar sus servicios, cuyo "
+"monto en su conjunto supere los US $ 1.500 anuales"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_26"
+msgid "Cigarrillos rubio"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_27"
+msgid "Cigarrillos negros"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_28"
+msgid "Bebidas alcohólicas, distintas a la cerveza"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_29"
+msgid ""
+"Productos del tabaco y sucedáneos del tabaco (abarcan los productos "
+"preparados totalmente o en parte utilizando como materia prima hojas de "
+"tabaco y destinados a ser fumados, chupados, inhalados, mascados o "
+"utilizados como rapé)."
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_3"
+msgid "Videojuegos"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_30"
+msgid "Cerveza"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_4"
+msgid ""
+"Armas de fuego, armas deportivas y municiones excepto aquellas adquiridas "
+"por la fuerza pública"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_5"
+msgid ""
+"Focos incandescentes excepto aquellos utilizados como insumos automotrices"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_6"
+msgid "Cocinas, calefones y otros de uso doméstico a gas SRI"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_7"
+msgid "Cocinas, calefones y otros de uso doméstico a gas SENAE"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_8"
+msgid ""
+"Vehículos motorizados cuyo precio de venta al público sea de hasta USD "
+"20.000"
+msgstr ""
+
+msgctxt "model:account.tax.special,name:ats_9"
+msgid ""
+"Camionetas, furgonetas, camiones, y vehículos de rescate cuyo precio de "
+"venta al público sea de hasta USD 30.000"
+msgstr ""
+
 msgctxt "model:ir.action,name:act_ats_export"
 msgid "Export ATS"
 msgstr "Generar ATS"
@@ -260,9 +1079,21 @@ msgctxt "model:ir.action,name:act_sustento_form"
 msgid "Sustento del comprobante ATS"
 msgstr ""
 
+msgctxt "model:ir.action,name:act_tax_electronic_form"
+msgid "Codigo de impuesto Retencion-Comprobantes Electronicos"
+msgstr ""
+
+msgctxt "model:ir.action,name:report_sumary_purchases"
+msgid "Generar Resumen de Compras y retenciones"
+msgstr ""
+
 msgctxt "model:ir.action,name:report_talon"
 msgid "Print ATS"
 msgstr "Imprimir ATS"
+
+msgctxt "model:ir.action,name:wizard_sumary_puchases"
+msgid "Generar Resumen de Compras y retenciones"
+msgstr ""
 
 msgctxt "model:ir.action,name:wizard_talon"
 msgid "Print ATS"
@@ -272,6 +1103,10 @@ msgctxt "model:ir.ui.menu,name:menu_export_ats"
 msgid "Export ATS"
 msgstr "Exportar ATS"
 
+msgctxt "model:ir.ui.menu,name:menu_sumary_purchases"
+msgid "Generar Resumen de Compras y retenciones"
+msgstr ""
+
 msgctxt "model:ir.ui.menu,name:menu_sustento_form"
 msgid "Sustento del comprobante ATS"
 msgstr ""
@@ -279,6 +1114,10 @@ msgstr ""
 msgctxt "model:ir.ui.menu,name:menu_talon"
 msgid "Print ATS"
 msgstr "Imprimir ATS"
+
+msgctxt "model:ir.ui.menu,name:menu_tax_electronic_form"
+msgid "Codigo de impuesto Retencion-Comprobantes Electronicos"
+msgstr ""
 
 msgctxt "model:nodux_account_ats.ats.export.result,name:"
 msgid "Export result"
@@ -288,9 +1127,368 @@ msgctxt "model:nodux_account_ats.print_ats.start,name:"
 msgid "Print ATS"
 msgstr "Imprimir ATS"
 
+msgctxt "model:nodux_account_ats.print_sumary_purchases.start,name:"
+msgid "Generate Purchases Annexed Start"
+msgstr ""
+
 msgctxt "model:nodux_account_ats.print_talon.start,name:"
 msgid "Print Talon Start"
 msgstr "Imprimir Talon ATS"
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "-"
+msgstr "-"
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "0%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "COMPRAS"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Factura"
+msgstr "Factura"
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Fecha"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Fecha retención"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "IVA"
+msgstr "IVA"
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Impreso:"
+msgstr "Impreso:"
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "N. retención"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "RAZON SOCIAL:"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "RUC:"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Fuente 1%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Fuente 10%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Fuente 2%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Iva 10%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Iva 100%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Iva 20%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Iva 30%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Ret. Iva 70%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "Subtotal 12%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "TALON RESUMEN DE ANEXO TRANSACCIONAL"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.sumary_purchases:"
+msgid "TOTAL"
+msgstr "TOTAL"
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid ", es fiel reflejo del presente reporte:"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "-"
+msgstr "-"
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "0"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "0.0"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "1"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "18"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "19"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "2"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "20"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "4"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "BI. Tarifa 0%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "BI. Tarifa 12%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Base Imponible"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Base No Objeto de IVA"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "COMPRA"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "COMPRAS"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "COMPROBANTES ANULADOS"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid ""
+"Certifico que la información contenida en el medio magnético adjunto al "
+"presente Anexo Transaccional para el"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Cod."
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Comprobantes de pago de cuotas o aportes"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Concepto de retención"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "DE IVA"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid ""
+"Declaro que los datos contenidos en este anexo son verdaderos, por lo que "
+"asumo la responsabilidad correspondiente, de acuerdo a lo establecido en el "
+"Art. 101 de la Codificación de la Ley de Régimen Tributario Interno."
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Docs. autorizados utilizados en ventas excepto N/C N/D"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Docs. por servicio administ. emitidos por insts. del Estado"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "EXPORTACIONES"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Factura"
+msgstr "Factura"
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Firma Contador"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Firma Representa"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Impreso:"
+msgstr "Impreso:"
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "No. Reg."
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Nota de crédito"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Nota o boleta de venta"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Operación"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "RAZON SOCIAL:"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "RESÚMEN DE RETENCIONES QUE LE EFECTUARON EN EL PERIODO"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "RESÚMEN DE RETENCIONES – AGENTE DE RETENCIÓN"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "RETENCION EN LA FUENTE"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "RETENCION EN LA FUENTE DE IMPUESTO A LA RENTA"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "RUC:"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Retención IVA 10%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Retención IVA 100%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Retención IVA 20%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Retención IVA 30%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Retención IVA 70%"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "SERVICIO DE RENTAS INTERNAS – RIG"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "TALON RESUMEN DE ANEXO TRANSACCIONAL"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "TOTAL"
+msgstr "TOTAL"
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid ""
+"Total de Comprobantes Anulados en el período informado (no incluye los dados"
+" de baja)"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Transacción"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "VENTA"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "VENTAS"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Valor FOB Comprobante"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Valor IVA"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Valor de IVA que le han retenido"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Valor de RENTA que le han retenido"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "Valor retenido"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "n"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "periodo"
+msgstr ""
+
+msgctxt "odt:nodux_account_ats.talon:"
+msgid "te Legal"
+msgstr ""
+
+msgctxt "selection:account.tax,code_withholding:"
+msgid ""
+msgstr ""
+
+msgctxt "selection:account.tax,code_withholding:"
+msgid "ISD"
+msgstr ""
+
+msgctxt "selection:account.tax,code_withholding:"
+msgid "IVA"
+msgstr "IVA"
+
+msgctxt "selection:account.tax,code_withholding:"
+msgid "RENTA"
+msgstr ""
 
 msgctxt "selection:party.party,convenio_doble:"
 msgid ""
@@ -392,6 +1590,18 @@ msgctxt "view:account.sustento:"
 msgid "Codigo para Retencion Comprobantes Electronicos"
 msgstr ""
 
+msgctxt "view:account.tax.electronic:"
+msgid "Codigo para Retencion Comprobantes Electronicos"
+msgstr ""
+
+msgctxt "view:account.tax.electronic:"
+msgid "Codigo para Retencion-Comprobantes Electronicos"
+msgstr ""
+
+msgctxt "view:account.tax:"
+msgid "Codigo de impuesto Retencion-Comprobantes Electronicos"
+msgstr ""
+
 msgctxt "view:nodux_account_ats.ats.export.result:"
 msgid "Export ATS"
 msgstr "Generar ATS"
@@ -399,6 +1609,14 @@ msgstr "Generar ATS"
 msgctxt "view:nodux_account_ats.print_ats.start:"
 msgid "Export ATS"
 msgstr "Generar ATS"
+
+msgctxt "view:nodux_account_ats.print_sumary_purchases.start:"
+msgid "Generate Summary Purchases"
+msgstr "Generar Anexo de Compras"
+
+msgctxt "view:nodux_account_ats.print_talon.start:"
+msgid "Print ATS"
+msgstr "Imprimir ATS"
 
 msgctxt "view:party.party:"
 msgid "ATS"
@@ -414,6 +1632,14 @@ msgstr "Cancelar"
 
 msgctxt "wizard_button:nodux_account_ats.ats.export,start,export:"
 msgid "Export"
+msgstr "Generar"
+
+msgctxt "wizard_button:nodux_account_ats.print_sumary_purchases,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:nodux_account_ats.print_sumary_purchases,start,print_:"
+msgid "Generate"
 msgstr "Generar"
 
 msgctxt "wizard_button:nodux_account_ats.print_talon,start,end:"

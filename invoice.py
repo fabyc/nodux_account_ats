@@ -6,8 +6,8 @@ from trytond.report import Report
 from trytond.transaction import Transaction
 from trytond.pool import Pool, PoolMeta
 from decimal import Decimal
-
 import time
+
 __all__ = ['Invoice']
 __metaclass__ = PoolMeta
 

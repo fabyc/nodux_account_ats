@@ -4,6 +4,25 @@ this repository contains the full copyright notices and license terms. -->
 <tryton>
     <data>
 
+      <record model="ir.ui.view" id="print_sumary_purchases_start_view_form">
+        <field name="model">nodux_account_ats.print_sumary_purchases.start</field>
+        <field name="type">form</field>
+        <field name="name">sumary_purchases_start_form</field>
+      </record>
+      <record model="ir.action.wizard" id="wizard_sumary_puchases">
+        <field name="name">Generar Anexo de Compras</field>
+        <field name="wiz_name">nodux_account_ats.print_sumary_purchases</field>
+      </record>
+      <menuitem parent="account.menu_reporting" action="wizard_sumary_puchases"
+          id="menu_sumary_purchases" icon="tryton-print"/>
+
+      <record model="ir.action.report" id="report_sumary_purchases">
+        <field name="name">Generar Anexo de Compras</field>
+        <field name="model"></field>
+        <field name="report_name">nodux_account_ats.sumary_purchases</field>
+        <field name="report">nodux_account_ats/sumary_purchases.odt</field>
+      </record>
+      <!--TALON ATS-->
         <record model="ir.ui.view" id="print_talon_start_view_form">
           <field name="model">nodux_account_ats.print_talon.start</field>
           <field name="type">form</field>

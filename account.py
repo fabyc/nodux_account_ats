@@ -31,7 +31,8 @@ import time
 
 
 __all__ = ['SustentoComprobante', 'ATSStart','ATSExportResult', 'ATSExport',
-            'PrintTalonStart', 'PrintTalon', 'ReportTalon']
+            'PrintTalonStart', 'PrintTalon', 'ReportTalon', 'ReportSummaryPurchases',
+            'GenerateSummaryPurchases', 'GenerateSummaryPurchasesStart']
 
 __metaclass__ = PoolMeta
 
@@ -110,6 +111,7 @@ class ATSStart(ModelView):
         total_ventas_paid = 0
         total_ventas_posted = 0
 
+
         for i in invoices_paid:
             for l in lines:
                 if i.move == l.move:
@@ -154,16 +156,18 @@ class ATSStart(ModelView):
 
         lines = MoveLine.search([('state', '=', 'valid')])
         total_ventas_paid = Decimal(0.0)
+        total_ventas_paid1 = Decimal(0.0)
         total_paid = Decimal(0.0)
+
 
         for i_all in invoices_all:
             if i_all != []:
                 for i in i_all:
+                    total_ventas_paid1 += i.untaxed_amount
                     for l in lines:
                         if i.move == l.move:
                             total_ventas_paid = total_ventas_paid + l.debit
-
-        total_ventas = total_ventas_paid
+        total_ventas = total_ventas_paid1
         ats = etree.Element('iva')
         etree.SubElement(ats, 'TipoIDInformante').text = 'R'
         etree.SubElement(ats, 'IdInformante').text = id_informante
@@ -259,7 +263,8 @@ class ATSStart(ModelView):
             if inv.ref_withholding:
                 Withholding_iva = pool.get('account.withholding')
                 Withholding_tax = pool.get('account.withholding.tax')
-                withholdings_iva = Withholding_iva.search([('number', '=', inv.ref_withholding), ('fisic', '=', False)])
+                #withholdings_iva = Withholding_iva.search([('number', '=', inv.ref_withholding), ('fisic', '=', False)])
+                withholdings_iva = Withholding_iva.search([('number', '=', inv.ref_withholding)])
                 for w_iva in withholdings_iva:
                     for w_taxes in w_iva.taxes:
                         if w_taxes.tax.code_electronic:
@@ -302,15 +307,16 @@ class ATSStart(ModelView):
             detallecompras.append(pagoExterior)
             """
             detallecompras.append(pagoExterior)
-            if inv.formas_pago_sri and subtotal14 >= Decimal(1000.0):
+            if inv.untaxed_amount >= Decimal(1000.0):
                 formasDePago = etree.Element('formasDePago')
-                etree.SubElement(formasDePago, 'formaPago').text = inv.formas_pago_sri.code
+                etree.SubElement(formasDePago, 'formaPago').text = '20'
                 detallecompras.append(formasDePago)
 
             withholding = None
             if inv.ref_withholding:
                 Withholding = pool.get('account.withholding')
-                withholdings = Withholding.search([('number', '=', inv.ref_withholding), ('fisic', '=', False)])
+                #withholdings = Withholding.search([('number', '=', inv.ref_withholding), ('fisic', '=', False)])
+                withholdings = Withholding.search([('number', '=', inv.ref_withholding)])
                 for w in withholdings:
                     withholding = w
 
@@ -336,8 +342,8 @@ class ATSStart(ModelView):
                 etree.SubElement(detallecompras, 'estabRetencion1').text = withholding.number[0:3]
                 etree.SubElement(detallecompras, 'ptoEmiRetencion1').text = withholding.number[4:7]
                 etree.SubElement(detallecompras, 'secRetencion1').text = withholding.number[8:17]
-                if withholding.numero_autorizacion:
-                    etree.SubElement(detallecompras, 'autRetencion1').text = withholding.numero_autorizacion
+                # if withholding.numero_autorizacion:
+                #     etree.SubElement(detallecompras, 'autRetencion1').text = withholding.numero_autorizacion
                 etree.SubElement(detallecompras, 'fechaEmiRet1').text = withholding.withholding_date.strftime('%d/%m/%Y')
                 """
                 etree.SubElement(detallecompras, 'docModificado').text = '0'
@@ -381,17 +387,22 @@ class ATSStart(ModelView):
             mIva = Decimal(0.0)
             subtotal_v_0 = Decimal(0.0)
             subtotal_v_14 = Decimal(0.0)
+            subtotal_v_12 = Decimal(0.0)
             etree.SubElement(detalleVentas, 'tipoComprobante').text = '18'
             numeroComprobantes = 0
+            subtotal_v_0 = Decimal(0.0)
+            subtotal_v_14 = Decimal(0.0)
+            subtotal_v_12 = Decimal(0.0)
             valorRetIva = Decimal(0.0)
             valorRetRenta = Decimal(0.0)
 
             if invoices_all_party != []:
                 for inv_out in invoices_all_party:
-                    if inv_out.formas_pago_sri:
-                        forma_pago = inv_out.formas_pago_sri.code
-                    else:
-                        forma_pago = None
+                    # if inv_out.formas_pago_sri:
+                    #     forma_pago = inv_out.formas_pago_sri.code
+                    # else:
+                    #     forma_pago = None
+                    forma_pago = None
                     taxes1 = None
                     taxes2 = None
                     taxes3 = None
@@ -409,21 +420,27 @@ class ATSStart(ModelView):
                                     subtotal_v_0= subtotal_v_0 + (line.amount)
                                 if str('{:.0f}'.format(t.tax.rate*100)) == '14':
                                     subtotal_v_14= subtotal_v_14 + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                                    subtotal_v_12= subtotal_v_12 + (line.amount)
                         elif taxes2:
                             for t in taxes2:
                                 if str('{:.0f}'.format(t.tax.rate*100)) == '0':
                                     subtotal_v_0= subtotal_v_0 + (line.amount)
                                 if str('{:.0f}'.format(t.tax.rate*100)) == '14':
                                     subtotal_v_14= subtotal_v_14 + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                                    subtotal_v_12= subtotal_v_12 + (line.amount)
                         elif taxes3:
                             for t in taxes3:
                                 if str('{:.0f}'.format(t.tax.rate*100)) == '0':
                                     subtotal_v_0= subtotal_v_0 + (line.amount)
                                 if str('{:.0f}'.format(t.tax.rate*100)) == '14':
                                     subtotal_v_14= subtotal_v_14 + (line.amount)
+                                if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                                    subtotal_v_12= subtotal_v_12 + (line.amount)
 
-                    baseImponible = (subtotal_v_14)
-                    montoIva = (baseImponible * (14))/100
+                    baseImponible = (subtotal_v_12)
+                    montoIva = (baseImponible * (12))/100
                     total_de_ventas += inv_out.total_amount
                     numeroComprobantes += 1
 
@@ -440,19 +457,19 @@ class ATSStart(ModelView):
                             if tax.tipo == 'RENTA':
                                 valorRetRenta += tax.amount *(-1)
 
-            etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
-            etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
-            etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
-            etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0)
-            etree.SubElement(detalleVentas, 'baseImpGrav').text = '%.2f' % (subtotal_v_14)
-            etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (montoIva)
-            etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
-            etree.SubElement(detalleVentas, 'valorRetIva').text = '%.2f' % (valorRetIva)
-            etree.SubElement(detalleVentas, 'valorRetRenta').text = '%.2f' % (valorRetRenta)
-            formasDePago = etree.Element('formasDePago')
-            etree.SubElement(formasDePago, 'formaPago').text = forma_pago
-            detalleVentas.append(formasDePago)
-            ventas.append(detalleVentas)
+                    etree.SubElement(detalleVentas, 'tipoEmision').text = "F"
+                    etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
+                    etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
+                    etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0)
+                    etree.SubElement(detalleVentas, 'baseImpGrav').text = '%.2f' % (subtotal_v_12)
+                    etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (montoIva)
+                    etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
+                    etree.SubElement(detalleVentas, 'valorRetIva').text = '%.2f' % (valorRetIva)
+                    etree.SubElement(detalleVentas, 'valorRetRenta').text = '%.2f' % (valorRetRenta)
+                    formasDePago = etree.Element('formasDePago')
+                    etree.SubElement(formasDePago, 'formaPago').text = "20"
+                    detalleVentas.append(formasDePago)
+                    ventas.append(detalleVentas)
 
         terceros_credit = []
         for c_p in credits_all:
@@ -537,7 +554,7 @@ class ATSStart(ModelView):
                             if tax.tipo == 'RENTA':
                                 valorRetRentaNC += tax.amount *(-1)
 
-            etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
+            etree.SubElement(detalleVentas, 'tipoEmision').text = "F"
             etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
             etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
             etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0_nc)
@@ -553,7 +570,7 @@ class ATSStart(ModelView):
         ventasEstablecimiento = etree.Element('ventasEstablecimiento')
         ventaEst = etree.Element('ventaEst')
         etree.SubElement(ventaEst, 'codEstab').text = '001'
-        etree.SubElement(ventaEst, 'ventasEstab').text = '%.2f'%total_ventas
+        etree.SubElement(ventaEst, 'ventasEstab').text = '%.2f'%total_ventas_paid1
         etree.SubElement(ventaEst, 'ivaComp').text = '0.00'
         ventasEstablecimiento.append(ventaEst)
         ats.append(ventasEstablecimiento)
@@ -708,7 +725,7 @@ class ReportTalon(Report):
         localcontext['bi0_fac_compras'] = cls._get_bi0_fac_compras(Period, period)
         localcontext['bi12_fac_compras'] = cls._get_bi12_fac_compras(Period, period)
         localcontext['noIva_fac_compras'] = Decimal(0.0)
-        localcontext['Iva_fac_compras'] =  company.currency.round((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.14))
+        localcontext['Iva_fac_compras'] =  company.currency.round((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.12))
         localcontext['no_bol_compras'] = Decimal(0.0)
         localcontext['bi0_bol_compras'] = Decimal(0.0)
         localcontext['bi12_bol_compras'] = Decimal(0.0)
@@ -718,7 +735,7 @@ class ReportTalon(Report):
         localcontext['bi0_nc_compras'] = cls._get_bi0_nc_compras(Period, period)
         localcontext['bi12_nc_compras'] = cls._get_bi12_nc_compras(Period, period)
         localcontext['noIva_nc_compras'] = Decimal(0.0)
-        localcontext['Iva_nc_compras'] = company.currency.round((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.14))
+        localcontext['Iva_nc_compras'] = company.currency.round((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.12))
         localcontext['no_cp_compras'] = Decimal(0.0)
         localcontext['bi0_cp_compras'] = Decimal(0.0)
         localcontext['bi12_cp_compras'] = Decimal(0.0)
@@ -733,17 +750,17 @@ class ReportTalon(Report):
         localcontext['total_bi0_compras'] = cls._get_bi0_fac_compras(Period, period)+cls._get_bi0_nc_compras(Period, period)
         localcontext['total_bi12_compras'] = cls._get_bi12_fac_compras(Period, period)+cls._get_bi12_nc_compras(Period, period)
         localcontext['total_noIva_compras'] = Decimal(0.0)
-        localcontext['total_iva_compras'] = company.currency.round(((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.14))+((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.14)))
+        localcontext['total_iva_compras'] = company.currency.round(((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.12))+((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.12)))
         localcontext['no_nc_ventas'] = cls._get_no_nc_ventas(Period, period)
         localcontext['bi0_nc_ventas'] = cls._get_bi0_nc_ventas(Period, period)
         localcontext['bi12_nc_ventas'] = cls._get_bi12_nc_ventas(Period, period)
         localcontext['noIva_nc_ventas'] = Decimal(0.0)
-        localcontext['Iva_nc_ventas'] = company.currency.round(cls._get_bi12_nc_ventas(Period, period) * Decimal(0.14))
+        localcontext['Iva_nc_ventas'] = company.currency.round(cls._get_bi12_nc_ventas(Period, period) * Decimal(0.12))
         localcontext['no_fac_ventas'] = cls._get_no_fac_ventas(Period, period)
         localcontext['bi0_fac_ventas'] = cls._get_bi0_fac_ventas(Period, period)
         localcontext['bi12_fac_ventas'] = cls._get_bi12_fac_ventas(Period, period)
         localcontext['noIva_fac_ventas'] = Decimal(0.0)
-        localcontext['Iva_fac_ventas'] = company.currency.round(cls._get_bi12_fac_ventas(Period, period) * Decimal(0.14))
+        localcontext['Iva_fac_ventas'] = company.currency.round(cls._get_bi12_fac_ventas(Period, period) * Decimal(0.12))
         localcontext['total_reg_ventas'] = localcontext['no_nc_ventas'] + localcontext['no_fac_ventas']
         localcontext['total_bi0_ventas'] = localcontext['bi0_nc_ventas'] + localcontext['bi0_fac_ventas']
         localcontext['total_bi12_ventas'] = localcontext['bi12_nc_ventas'] + localcontext['bi12_fac_ventas']
@@ -782,8 +799,8 @@ class ReportTalon(Report):
     def _get_bi0_fac_compras(cls, Period, period):
         bi0_fac_compras = Decimal(0.00)
         pool = Pool()
-        Taxes1 = pool.get('product.category-customer-account.tax')
-        Taxes2 = pool.get('product.template-customer-account.tax')
+        Taxes1 = pool.get('product.category-supplier-account.tax')
+        Taxes2 = pool.get('product.template-supplier-account.tax')
         Invoice = pool.get('account.invoice')
         invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
         if invoices:
@@ -799,6 +816,7 @@ class ReportTalon(Report):
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
                         taxes3 = Taxes2.search([('product','=', line.product)])
+
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -816,6 +834,7 @@ class ReportTalon(Report):
     @classmethod
     def _get_bi12_fac_compras(cls, Period, period):
         bi12_fac_compras = Decimal(0.00)
+        bi14_fac_compras = Decimal(0.00)
         pool = Pool()
         Taxes1 = pool.get('product.category-supplier-account.tax')
         Taxes2 = pool.get('product.template-supplier-account.tax')
@@ -838,13 +857,13 @@ class ReportTalon(Report):
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '14':
-                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                bi14_fac_compras= bi14_fac_compras + (line.amount)
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_compras= bi12_fac_compras + (line.amount)
                     elif taxes2:
                         for t in taxes2:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '14':
-                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                bi14_fac_compras= bi14_fac_compras + (line.amount)
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_compras= bi12_fac_compras + (line.amount)
                     elif taxes3:
@@ -1084,16 +1103,17 @@ class ReportTalon(Report):
                         taxes3 = Taxes2.search([('product','=', line.product)])
                     if taxes1:
                         for t in taxes1:
-                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_ventas= bi12_fac_ventas + (line.amount)
                     elif taxes2:
                         for t in taxes2:
-                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_ventas= bi12_fac_ventas + (line.amount)
                     elif taxes3:
                         for t in taxes3:
-                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_ventas= bi12_fac_ventas + (line.amount)
+
         return bi12_fac_ventas
 
     @classmethod
@@ -1129,6 +1149,7 @@ class ReportTalon(Report):
             base = Decimal(0.0)
             retenido = Decimal(0.0)
             cont = 0
+            code = ""
 
             for withholding in withholdings:
                 for w_taxes in withholding.taxes:
@@ -1159,7 +1180,8 @@ class ReportTalon(Report):
         invoices = Invoice.search([('type','=','in_invoice'), ('state', '!=', 'draft'), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('no_generate_withholding', '=', True)])
 
         for invoice in invoices:
-            base += invoice.untaxed_amount
+            for line in invoice.lines:
+                base += line.amount
 
         lineas = {}
         lineas['code'] = 332
@@ -1186,7 +1208,6 @@ class ReportTalon(Report):
         pool = Pool()
         Invoice = pool.get('account.invoice')
         invoices = Invoice.search([('type','=','in_invoice'), ('state', '!=', 'draft'), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('no_generate_withholding', '=', True)])
-
         for invoice in invoices:
             base += invoice.untaxed_amount
         return base
@@ -1255,7 +1276,8 @@ class ReportTalon(Report):
             for w_taxes in withholding.taxes:
                 if w_taxes.tax.code_electronic:
                     if w_taxes.tax.code_electronic.code == '9':
-                        retenido_10 = w_taxes.amount * (-1)
+                        retenido_10 += w_taxes.amount * (-1)
+
                 else:
                     withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_10
@@ -1271,7 +1293,7 @@ class ReportTalon(Report):
             for w_taxes in withholding.taxes:
                 if w_taxes.tax.code_electronic:
                     if w_taxes.tax.code_electronic.code == '10':
-                        retenido_20 = w_taxes.amount * (-1)
+                        retenido_20 += w_taxes.amount * (-1)
                 else:
                     withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_20
@@ -1287,7 +1309,7 @@ class ReportTalon(Report):
             for w_taxes in withholding.taxes:
                 if w_taxes.tax.code_electronic:
                     if w_taxes.tax.code_electronic.code == '1':
-                        retenido_30 = w_taxes.amount * (-1)
+                        retenido_30 += w_taxes.amount * (-1)
                 else:
                     withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_30
@@ -1303,7 +1325,7 @@ class ReportTalon(Report):
             for w_taxes in withholding.taxes:
                 if w_taxes.tax.code_electronic:
                     if w_taxes.tax.code_electronic.code == '2':
-                        retenido_70 = w_taxes.amount * (-1)
+                        retenido_70 += w_taxes.amount * (-1)
                 else:
                     withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
         return retenido_70
@@ -1319,7 +1341,7 @@ class ReportTalon(Report):
             for w_taxes in withholding.taxes:
                 if w_taxes.tax.code_electronic:
                     if w_taxes.tax.code_electronic.code == '3':
-                        retenido_100 = w_taxes.amount * (-1)
+                        retenido_100 += w_taxes.amount * (-1)
                 else:
                     withholding.raise_user_error('Configure el codigo del impuesto \n%s', w_taxes.description)
 
@@ -1350,3 +1372,201 @@ class ReportTalon(Report):
                 if (w_taxes.tipo == 'RENTA') | (w_taxes.tax.code_withholding == '1'):
                     renta_retenido_venta += (w_taxes.amount * (-1))
         return renta_retenido_venta
+
+
+class GenerateSummaryPurchasesStart(ModelView):
+    'Generate Purchases Annexed Start'
+    __name__ = 'nodux_account_ats.print_sumary_purchases.start'
+    company = fields.Many2One('company.company', 'Company', required=True)
+    fiscalyear = fields.Many2One('account.fiscalyear', 'Fiscal Year',
+        required=True)
+    periodo = fields.Many2One('account.period', 'Period',
+        domain=[('fiscalyear', '=', Eval('fiscalyear'))], required = True )
+
+    @staticmethod
+    def default_company():
+        return Transaction().context.get('company')
+
+class GenerateSummaryPurchases(Wizard):
+    'Generate Purchases Annexed'
+    __name__ = 'nodux_account_ats.print_sumary_purchases'
+    start = StateView('nodux_account_ats.print_sumary_purchases.start',
+        'nodux_account_ats.print_sumary_purchases_start_view_form', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('Generate', 'print_', 'tryton-print', default=True),
+            ])
+    print_ = StateAction('nodux_account_ats.report_sumary_purchases')
+
+    def do_print_(self, action):
+        data = {
+            'company': self.start.company.id,
+            'fiscalyear' : self.start.fiscalyear.id,
+            'periodo' : self.start.periodo.id,
+            }
+        return action, data
+
+    def transition_print_(self):
+        return 'end'
+
+class ReportSummaryPurchases(Report):
+    'Report Purchases Annexed'
+    __name__ = 'nodux_account_ats.sumary_purchases'
+
+    @classmethod
+    def parse(cls, report, objects, data, localcontext):
+        Company = Pool().get('company.company')
+        company_id = Transaction().context.get('company')
+        company = Company(company_id)
+        Period = Pool().get('account.period')
+        period = Period(data['periodo'])
+        if company.timezone:
+            timezone = pytz.timezone(company.timezone)
+            dt = datetime.now()
+            hora = datetime.astimezone(dt.replace(tzinfo=pytz.utc), timezone)
+        localcontext['company'] = company
+        localcontext['periodo'] = period
+        localcontext['hora'] = hora.strftime('%H:%M:%S')
+        localcontext['fecha'] = hora.strftime('%d/%m/%Y')
+        localcontext['purchases'] = cls._get_purchases(Period, period)
+
+        return super(ReportSummaryPurchases, cls).parse(report, objects, data, localcontext)
+
+    @classmethod
+    def _get_purchases(cls, Period, period):
+        pool = Pool()
+        Taxes1 = pool.get('product.category-supplier-account.tax')
+        Taxes2 = pool.get('product.template-supplier-account.tax')
+        Invoice = pool.get('account.invoice')
+        Withholding = pool.get('account.withholding')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        total_bi0_fac_compras = Decimal(0.00)
+        total_bi12_fac_compras = Decimal(0.00)
+        total_iva_fac_compras = Decimal(0.00)
+        total_ret_10_fuente = Decimal(0.00)
+        total_ret_1_fuente = Decimal(0.00)
+        total_ret_2_fuente = Decimal(0.00)
+        total_ret_10_iva = Decimal(0.00)
+        total_ret_20_iva = Decimal(0.00)
+        total_ret_70_iva = Decimal(0.00)
+        total_ret_30_iva = Decimal(0.00)
+        total_ret_100_iva = Decimal(0.00)
+        purchases = []
+        cont = 0
+
+        if invoices:
+            for invoice in invoices:
+                bi0_fac_compras = Decimal(0.00)
+                bi12_fac_compras = Decimal(0.00)
+                iva_fac_compras = invoice.tax_amount
+                total_iva_fac_compras += invoice.tax_amount
+                ret_10_fuente = Decimal(0.00)
+                ret_1_fuente = Decimal(0.00)
+                ret_2_fuente = Decimal(0.00)
+                ret_no_fuente = Decimal(0.00)
+                ret_10_iva = Decimal(0.00)
+                ret_20_iva = Decimal(0.00)
+                ret_30_iva = Decimal(0.00)
+                ret_70_iva = Decimal(0.00)
+                ret_100_iva = Decimal(0.00)
+                retencion = ""
+                date_w = ""
+
+                withholdings = Withholding.search([('party', '=', invoice.party),('type', '=', 'in_withholding'),('number_w', '=', invoice.reference), ('state', '!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
+                print "***Withholding", withholdings
+                for withholding in withholdings:
+                    print "***Withholding", withholdings
+                    retencion = withholding.number
+                    date_w = withholding.withholding_date
+                    for w_taxes in withholding.taxes:
+                        if w_taxes.tipo == 'RENTA':
+                            if str('{:.0f}'.format(w_taxes.tax.rate*100)) == '-10':
+                                ret_10_fuente = w_taxes.amount * (-1)
+                                total_ret_10_fuente += w_taxes.amount * (-1)
+
+                            if str('{:.0f}'.format(w_taxes.tax.rate*100)) == '-1':
+                                ret_1_fuente = w_taxes.amount * (-1)
+                                total_ret_1_fuente = w_taxes.amount * (-1)
+
+                            if str('{:.0f}'.format(w_taxes.tax.rate*100)) == '-2':
+                                ret_2_fuente = w_taxes.amount * (-1)
+                                total_ret_2_fuente = w_taxes.amount * (-1)
+                        else:
+                            if w_taxes.tax.code_electronic:
+                                if w_taxes.tax.code_electronic.code == '3':
+                                    ret_100_iva = w_taxes.amount * (-1)
+                                    total_ret_100_iva = Decimal(0.00)
+
+                                elif w_taxes.tax.code_electronic.code == '9':
+                                    ret_10_iva = w_taxes.amount * (-1)
+                                    total_ret_10_iva = Decimal(0.00)
+
+                                elif w_taxes.tax.code_electronic.code == '10':
+                                    ret_20_iva = w_taxes.amount * (-1)
+                                    total_ret_20_iva = Decimal(0.00)
+
+                                elif w_taxes.tax.code_electronic.code == '1':
+                                    ret_30_iva = w_taxes.amount * (-1)
+                                    total_ret_30_iva = Decimal(0.00)
+
+                                elif w_taxes.tax.code_electronic.code == '2':
+                                    ret_70_iva = w_taxes.amount * (-1)
+                                    total_ret_70_iva = Decimal(0.00)
+
+                for line in invoice.lines:
+                    taxes1 = None
+                    taxes2 = None
+                    taxes3 = None
+                    if line.product.taxes_category == True:
+                        if line.product.category.taxes_parent == True:
+                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                        else:
+                            taxes1= Taxes1.search([('category','=', line.product.category)])
+                    else:
+                        taxes3 = Taxes2.search([('product','=', line.product)])
+
+                    if taxes1:
+                        for t in taxes1:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_compras= bi0_fac_compras + (line.amount)
+                                total_bi0_fac_compras += line.amount
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                total_bi12_fac_compras += line.amount
+                    elif taxes2:
+                        for t in taxes2:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_compras= bi0_fac_compras + (line.amount)
+                                total_bi0_fac_compras += line.amount
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                total_bi12_fac_compras += line.amount
+                    elif taxes3:
+                        for t in taxes3:
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '0':
+                                bi0_fac_compras= bi0_fac_compras + (line.amount)
+                                total_bi0_fac_compras += line.amount
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '12':
+                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                total_bi12_fac_compras += line.amount
+                cont += 1
+                lineas = {}
+                lineas['id'] = cont
+                lineas['number'] = invoice.number
+                lineas['date'] = invoice.invoice_date
+                lineas['subtotal12'] = bi12_fac_compras
+                lineas['subtotal0'] = bi0_fac_compras
+                lineas['iva'] = iva_fac_compras
+                lineas['ret_10_fuente'] = ret_10_fuente
+                lineas['ret_1_fuente'] = ret_1_fuente
+                lineas['ret_2_fuente'] = ret_2_fuente
+                lineas['ret_10_iva'] = ret_10_iva
+                lineas['ret_20_iva'] = ret_20_iva
+                lineas['ret_30_iva'] = ret_30_iva
+                lineas['ret_70_iva'] = ret_70_iva
+                lineas['ret_100_iva'] = ret_100_iva
+                lineas['retencion'] = retencion
+                lineas['date_w'] = date_w
+
+                purchases.append(lineas)
+
+        return purchases
