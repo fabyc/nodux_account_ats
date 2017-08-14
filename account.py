@@ -377,7 +377,7 @@ class ATSStart(ModelView):
                 pass
                 etree.SubElement(detalleVentas, 'tpIdCliente').text = identificacionCliente[party.type_document]
             else:
-                cls.raise_user_error('No ha configurado el tipo de documento del tercero')
+                cls.raise_user_error('No ha configurado el tipo de documento del tercero %s', party.name )
             etree.SubElement(detalleVentas, 'idCliente').text = party.vat_number
             etree.SubElement(detalleVentas, 'parteRelVtas').text = party.parte_relacional
             invoices_a_p = Invoice.search([('type','=','out_invoice'), ('state','in',['posted','paid']), ('party', '=',party.id), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
@@ -413,7 +413,7 @@ class ATSStart(ModelView):
                             else:
                                 taxes1= Taxes1.search([('category','=', line.product.category)])
                         else:
-                            taxes3 = Taxes2.search([('product','=', line.product)])
+                            taxes3 = Taxes2.search([('product','=', line.product.template)])
                         if taxes1:
                             for t in taxes1:
                                 if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -485,7 +485,7 @@ class ATSStart(ModelView):
                 pass
                 etree.SubElement(detalleVentas, 'tpIdCliente').text = identificacionCliente[party.type_document]
             else:
-                cls.raise_user_error('No ha configurado el tipo de documento del tercero')
+                cls.raise_user_error('No ha configurado el tipo de documento del tercero', party.name)
             etree.SubElement(detalleVentas, 'idCliente').text = party.vat_number
             etree.SubElement(detalleVentas, 'parteRelVtas').text = party.parte_relacional
             credits_a_p = Invoice.search([('type','=','out_credit_note'), ('state','in',['posted','paid']), ('party', '=',party.id), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
@@ -516,7 +516,7 @@ class ATSStart(ModelView):
                             else:
                                 taxes1= Taxes1.search([('category','=', line.product.category)])
                         else:
-                            taxes3 = Taxes2.search([('product','=', line.product)])
+                            taxes3 = Taxes2.search([('product','=', line.product.template)])
                         if taxes1:
                             for t in taxes1:
                                 if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -811,12 +811,11 @@ class ReportTalon(Report):
                     taxes3 = None
                     if line.product.taxes_category == True:
                         if line.product.category.taxes_parent == True:
-                            taxes1= Taxes1.search([('category','=', line.product.category.parent)])
+                            taxes1 = Taxes1.search([('category','=', line.product.category.parent)])
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
-
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -904,7 +903,7 @@ class ReportTalon(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -939,7 +938,7 @@ class ReportTalon(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '14':
@@ -985,7 +984,7 @@ class ReportTalon(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -1020,7 +1019,7 @@ class ReportTalon(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '14':
@@ -1065,7 +1064,7 @@ class ReportTalon(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -1100,7 +1099,7 @@ class ReportTalon(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
                     if taxes1:
                         for t in taxes1:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
@@ -1436,6 +1435,7 @@ class ReportSummaryPurchases(Report):
         pool = Pool()
         Taxes1 = pool.get('product.category-supplier-account.tax')
         Taxes2 = pool.get('product.template-supplier-account.tax')
+
         Invoice = pool.get('account.invoice')
         Withholding = pool.get('account.withholding')
         invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
@@ -1472,9 +1472,7 @@ class ReportSummaryPurchases(Report):
                 date_w = ""
 
                 withholdings = Withholding.search([('party', '=', invoice.party),('type', '=', 'in_withholding'),('number_w', '=', invoice.reference), ('state', '!=', 'draft'), ('withholding_date', '>=', period.start_date), ('withholding_date', '<=', period.end_date)])
-                print "***Withholding", withholdings
                 for withholding in withholdings:
-                    print "***Withholding", withholdings
                     retencion = withholding.number
                     date_w = withholding.withholding_date
                     for w_taxes in withholding.taxes:
@@ -1522,7 +1520,7 @@ class ReportSummaryPurchases(Report):
                         else:
                             taxes1= Taxes1.search([('category','=', line.product.category)])
                     else:
-                        taxes3 = Taxes2.search([('product','=', line.product)])
+                        taxes3 = Taxes2.search([('product','=', line.product.template)])
 
                     if taxes1:
                         for t in taxes1:
@@ -1530,7 +1528,7 @@ class ReportSummaryPurchases(Report):
                                 bi0_fac_compras= bi0_fac_compras + (line.amount)
                                 total_bi0_fac_compras += line.amount
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
-                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                bi12_fac_compras += (line.amount)
                                 total_bi12_fac_compras += line.amount
                     elif taxes2:
                         for t in taxes2:
@@ -1538,7 +1536,7 @@ class ReportSummaryPurchases(Report):
                                 bi0_fac_compras= bi0_fac_compras + (line.amount)
                                 total_bi0_fac_compras += line.amount
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
-                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                bi12_fac_compras += (line.amount)
                                 total_bi12_fac_compras += line.amount
                     elif taxes3:
                         for t in taxes3:
@@ -1546,7 +1544,7 @@ class ReportSummaryPurchases(Report):
                                 bi0_fac_compras= bi0_fac_compras + (line.amount)
                                 total_bi0_fac_compras += line.amount
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
-                                bi12_fac_compras= bi12_fac_compras + (line.amount)
+                                bi12_fac_compras += (line.amount)
                                 total_bi12_fac_compras += line.amount
                 cont += 1
                 lineas = {}
