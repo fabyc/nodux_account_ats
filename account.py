@@ -1553,7 +1553,7 @@ class ReportSummaryPurchases(Report):
                 cont += 1
                 lineas = {}
                 lineas['id'] = cont
-                lineas['number'] = invoice.number
+                lineas['number'] = invoice.reference
                 lineas['date'] = invoice.invoice_date
                 lineas['subtotal12'] = bi12_fac_compras
                 lineas['subtotal0'] = bi0_fac_compras
