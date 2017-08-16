@@ -1427,6 +1427,10 @@ class ReportSummaryPurchases(Report):
         localcontext['hora'] = hora.strftime('%H:%M:%S')
         localcontext['fecha'] = hora.strftime('%d/%m/%Y')
         localcontext['purchases'] = cls._get_purchases(Period, period)
+        localcontext['total_bi0_fac_compras'] = cls._total_bi0_fac_compras(Period, period)
+        localcontext['total_bi12_fac_compras'] = cls._total_bi12_fac_compras(Period, period)
+        localcontext['total_iva_fac_compras'] = cls._total_iva_fac_compras(Period, period)
+        localcontext['total_fac_compras'] =  cls._total_fac_compras(Period, period)
 
         return super(ReportSummaryPurchases, cls).parse(report, objects, data, localcontext)
 
@@ -1568,3 +1572,77 @@ class ReportSummaryPurchases(Report):
                 purchases.append(lineas)
 
         return purchases
+
+    @classmethod
+    def _total_bi0_fac_compras(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        total_bi0_fac_compras= Decimal(0.00)
+
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    if  line.taxes:
+                        for t in line.taxes:
+                            if str('{:.0f}'.format(t.rate*100)) == '0':
+                                total_bi0_fac_compras+= line.amount
+
+        return total_bi0_fac_compras
+
+    @classmethod
+    def _total_bi12_fac_compras(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        total_bi12_fac_compras= Decimal(0.00)
+
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    if  line.taxes:
+                        for t in line.taxes:
+                            if str('{:.0f}'.format(t.rate*100)) == '12':
+                                total_bi12_fac_compras+= line.amount
+
+        return total_bi12_fac_compras
+
+    @classmethod
+    def _total_iva_fac_compras(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        total_iva_fac_compras= Decimal(0.00)
+
+        if invoices:
+            for invoice in invoices:
+                total_iva_fac_compras += invoice.tax_amount
+
+        return total_iva_fac_compras
+
+    @classmethod
+    def _total_fac_compras(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        total_fac_compras= Decimal(0.00)
+        total_iva_fac_compras = Decimal(0.00)
+        total_bi0_fac_compras = Decimal(0.00)
+        total_bi12_fac_compras = Decimal(0.00)
+
+
+        if invoices:
+            for invoice in invoices:
+                total_iva_fac_compras += invoice.tax_amount
+                for line in invoice.lines:
+                    if  line.taxes:
+                        for t in line.taxes:
+                            if str('{:.0f}'.format(t.rate*100)) == '0':
+                                total_bi0_fac_compras+= line.amount
+                        for t in line.taxes:
+                            if str('{:.0f}'.format(t.rate*100)) == '12':
+                                total_bi12_fac_compras+= line.amount
+
+            total_fac_compras = (total_iva_fac_compras + total_bi0_fac_compras + total_bi12_fac_compras)
+
+        return total_fac_compras
