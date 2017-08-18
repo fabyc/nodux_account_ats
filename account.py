@@ -355,6 +355,24 @@ class ATSStart(ModelView):
                 etree.SubElement(detallecompras, 'secModificado').text = '0'
                 etree.SubElement(detallecompras, 'autModificado').text = '0000'
                 """
+            else:
+                base = Decimal(0.0)
+                for line in inv.lines:
+                    base += line.amount
+                etree.SubElement(detalleAir, 'codRetAir').text = "332"
+                etree.SubElement(detalleAir, 'baseImpAir').text = '{:.2f}'.format(base)
+                etree.SubElement(detalleAir, 'porcentajeAir').text = '0'
+                etree.SubElement(detalleAir, 'valRetAir').text = '0'
+                air.append(detalleAir)
+                detallecompras.append(air)
+                """
+                etree.SubElement(detallecompras, 'docModificado').text = '0'
+                etree.SubElement(detallecompras, 'estabModificado').text = '000'
+                etree.SubElement(detallecompras, 'ptoEmiModificado').text = '000'
+                etree.SubElement(detallecompras, 'secModificado').text = '0'
+                etree.SubElement(detallecompras, 'autModificado').text = '0000'
+                """
+
             compras.append(detallecompras)
         ats.append(compras)
         partys = Party.search([('active', '=','true')])
