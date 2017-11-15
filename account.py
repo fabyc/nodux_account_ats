@@ -236,10 +236,11 @@ class ATSStart(ModelView):
                 inv.raise_user_error('No ha configurado el tipo de sustento del tercero %s. \nDirijase a Terceros->Terceros->Seleccione y modifique', inv.party.name)
             etree.SubElement(detallecompras, 'tpIdProv').text = tipoIdentificacion[inv.party.type_document]
             etree.SubElement(detallecompras, 'idProv').text = inv.party.vat_number
-            if inv.sale_note != True:
-                etree.SubElement(detallecompras, 'tipoComprobante').text = tipoDocumento[inv.type]
-            else:
-                etree.SubElement(detallecompras, 'tipoComprobante').text = '02'
+            # if inv.sale_note != True:
+            #     etree.SubElement(detallecompras, 'tipoComprobante').text = tipoDocumento[inv.type]
+            # else:
+            #     etree.SubElement(detallecompras, 'tipoComprobante').text = '02'
+            etree.SubElement(detallecompras, 'tipoComprobante').text = '02'
             etree.SubElement(detallecompras, 'parteRel').text = inv.party.parte_relacional
             if tipoIdentificacion[inv.party.type_document] == '03':
                 etree.SubElement(detallecompras, 'tipoProv').text = tipoProvedor[inv.party.type_party]
@@ -747,11 +748,17 @@ class ReportTalon(Report):
         localcontext['bi12_fac_compras'] = cls._get_bi12_fac_compras(Period, period)
         localcontext['noIva_fac_compras'] = Decimal(0.0)
         localcontext['Iva_fac_compras'] =  company.currency.round((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.12))
-        localcontext['no_bol_compras'] = cls._get_no_bol_compras(Period, period)
-        localcontext['bi0_bol_compras'] = cls._get_bi0_bol_compras(Period, period)
-        localcontext['bi12_bol_compras'] = cls._get_bi12_bol_compras(Period, period)
+        # localcontext['no_bol_compras'] = cls._get_no_bol_compras(Period, period)
+        # localcontext['bi0_bol_compras'] = cls._get_bi0_bol_compras(Period, period)
+        # localcontext['bi12_bol_compras'] = cls._get_bi12_bol_compras(Period, period)
+        # localcontext['noIva_bol_compras'] = Decimal(0.0)
+        # localcontext['Iva_bol_compras'] = company.currency.round((cls._get_bi12_bol_compras(Period, period)) * Decimal(0.12))
+
+        localcontext['no_bol_compras'] = Decimal(0.0)
+        localcontext['bi0_bol_compras'] = Decimal(0.0)
+        localcontext['bi12_bol_compras'] = Decimal(0.0)
         localcontext['noIva_bol_compras'] = Decimal(0.0)
-        localcontext['Iva_bol_compras'] = company.currency.round((cls._get_bi12_bol_compras(Period, period)) * Decimal(0.12))
+        localcontext['Iva_bol_compras'] = Decimal(0.0)
         localcontext['no_nc_compras'] = cls._get_no_nc_compras(Period, period)
         localcontext['bi0_nc_compras'] = cls._get_bi0_nc_compras(Period, period)
         localcontext['bi12_nc_compras'] = cls._get_bi12_nc_compras(Period, period)
@@ -767,11 +774,18 @@ class ReportTalon(Report):
         localcontext['bi12_estado_compras'] = Decimal(0.0)
         localcontext['noIva_estado_compras'] = Decimal(0.0)
         localcontext['Iva_estado_compras'] = Decimal(0.0)
-        localcontext['total_reg_compras'] = cls._get_no_fac_compras(Period, period)+cls._get_no_nc_compras(Period, period)+cls._get_no_bol_compras(Period, period)
-        localcontext['total_bi0_compras'] = cls._get_bi0_fac_compras(Period, period)+cls._get_bi0_nc_compras(Period, period)+cls._get_bi0_bol_compras(Period, period)
-        localcontext['total_bi12_compras'] = cls._get_bi12_fac_compras(Period, period)+cls._get_bi12_nc_compras(Period, period)+cls._get_bi12_bol_compras(Period, period)
+        # localcontext['total_reg_compras'] = cls._get_no_fac_compras(Period, period)+cls._get_no_nc_compras(Period, period)+cls._get_no_bol_compras(Period, period)
+        # localcontext['total_bi0_compras'] = cls._get_bi0_fac_compras(Period, period)+cls._get_bi0_nc_compras(Period, period)+cls._get_bi0_bol_compras(Period, period)
+        # localcontext['total_bi12_compras'] = cls._get_bi12_fac_compras(Period, period)+cls._get_bi12_nc_compras(Period, period)+cls._get_bi12_bol_compras(Period, period)
+        # localcontext['total_noIva_compras'] = Decimal(0.0)
+        # localcontext['total_iva_compras'] = company.currency.round(((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.12))+((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.12)))
+
+        localcontext['total_reg_compras'] = cls._get_no_fac_compras(Period, period)+cls._get_no_nc_compras(Period, period)
+        localcontext['total_bi0_compras'] = cls._get_bi0_fac_compras(Period, period)+cls._get_bi0_nc_compras(Period, period)
+        localcontext['total_bi12_compras'] = cls._get_bi12_fac_compras(Period, period)+cls._get_bi12_nc_compras(Period, period)
         localcontext['total_noIva_compras'] = Decimal(0.0)
         localcontext['total_iva_compras'] = company.currency.round(((cls._get_bi12_fac_compras(Period, period)) * Decimal(0.12))+((cls._get_bi12_nc_compras(Period, period)) * Decimal(0.12)))
+
         localcontext['no_nc_ventas'] = cls._get_no_nc_ventas(Period, period)
         localcontext['bi0_nc_ventas'] = cls._get_bi0_nc_ventas(Period, period)
         localcontext['bi12_nc_ventas'] = cls._get_bi12_nc_ventas(Period, period)
@@ -812,7 +826,8 @@ class ReportTalon(Report):
     def _get_no_fac_compras(cls, Period, period):
         pool = Pool()
         Invoice = pool.get('account.invoice')
-        invoices = Invoice.search_count([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', False)])
+        #invoices = Invoice.search_count([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', False)])
+        invoices = Invoice.search_count([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
 
         return invoices
 
@@ -823,7 +838,9 @@ class ReportTalon(Report):
         Taxes1 = pool.get('product.category-supplier-account.tax')
         Taxes2 = pool.get('product.template-supplier-account.tax')
         Invoice = pool.get('account.invoice')
-        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date),('sale_note', '=', False)])
+        #invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date),('sale_note', '=', False)])
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+
         if invoices:
             for invoice in invoices:
                 for line in invoice.lines:
@@ -859,7 +876,9 @@ class ReportTalon(Report):
         Taxes1 = pool.get('product.category-supplier-account.tax')
         Taxes2 = pool.get('product.template-supplier-account.tax')
         Invoice = pool.get('account.invoice')
-        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', False)])
+        #invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', False)])
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+
         if invoices:
             for invoice in invoices:
                 for line in invoice.lines:
@@ -899,7 +918,8 @@ class ReportTalon(Report):
     def _get_no_bol_compras(cls, Period, period):
         pool = Pool()
         Invoice = pool.get('account.invoice')
-        invoices = Invoice.search_count([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', True)])
+        #invoices = Invoice.search_count([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', True)])
+        invoices = Invoice.search_count([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
 
         return invoices
 
@@ -910,7 +930,9 @@ class ReportTalon(Report):
         Taxes1 = pool.get('product.category-supplier-account.tax')
         Taxes2 = pool.get('product.template-supplier-account.tax')
         Invoice = pool.get('account.invoice')
-        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', True)])
+        #invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date), ('sale_note', '=', True)])
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+
         if invoices:
             for invoice in invoices:
                 for line in invoice.lines:
@@ -946,7 +968,9 @@ class ReportTalon(Report):
         Taxes1 = pool.get('product.category-supplier-account.tax')
         Taxes2 = pool.get('product.template-supplier-account.tax')
         Invoice = pool.get('account.invoice')
-        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date),('sale_note', '=', True)])
+        #invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date),('sale_note', '=', True)])
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+
         if invoices:
             for invoice in invoices:
                 for line in invoice.lines:
