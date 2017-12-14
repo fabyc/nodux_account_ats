@@ -479,19 +479,19 @@ class ATSStart(ModelView):
                             if tax.tipo == 'RENTA':
                                 valorRetRenta += tax.amount *(-1)
 
-                    etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
-                    etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
-                    etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
-                    etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0)
-                    etree.SubElement(detalleVentas, 'baseImpGrav').text = '%.2f' % (subtotal_v_12)
-                    etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (montoIva)
-                    etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
-                    etree.SubElement(detalleVentas, 'valorRetIva').text = '%.2f' % (valorRetIva)
-                    etree.SubElement(detalleVentas, 'valorRetRenta').text = '%.2f' % (valorRetRenta)
-                    formasDePago = etree.Element('formasDePago')
-                    etree.SubElement(formasDePago, 'formaPago').text = "20"
-                    detalleVentas.append(formasDePago)
-                    ventas.append(detalleVentas)
+                etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
+                etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
+                etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
+                etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0)
+                etree.SubElement(detalleVentas, 'baseImpGrav').text = '%.2f' % (subtotal_v_12)
+                etree.SubElement(detalleVentas, 'montoIva').text = '%.2f' % (montoIva)
+                etree.SubElement(detalleVentas, 'montoIce').text = '0.00'
+                etree.SubElement(detalleVentas, 'valorRetIva').text = '%.2f' % (valorRetIva)
+                etree.SubElement(detalleVentas, 'valorRetRenta').text = '%.2f' % (valorRetRenta)
+                formasDePago = etree.Element('formasDePago')
+                etree.SubElement(formasDePago, 'formaPago').text = "20"
+                detalleVentas.append(formasDePago)
+                ventas.append(detalleVentas)
 
         terceros_credit = []
         for c_p in credits_all:
