@@ -479,7 +479,7 @@ class ATSStart(ModelView):
                             if tax.tipo == 'RENTA':
                                 valorRetRenta += tax.amount *(-1)
 
-                    etree.SubElement(detalleVentas, 'tipoEmision').text = "F"
+                    etree.SubElement(detalleVentas, 'tipoEmision').text = "E"
                     etree.SubElement(detalleVentas, 'numeroComprobantes').text = str(numeroComprobantes)
                     etree.SubElement(detalleVentas, 'baseNoGraIva').text = '0.00'
                     etree.SubElement(detalleVentas, 'baseImponible').text = '%.2f' % (subtotal_v_0)
