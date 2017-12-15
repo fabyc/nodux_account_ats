@@ -1596,6 +1596,7 @@ class ReportSummaryPurchases(Report):
             for invoice in invoices:
                 bi0_fac_compras = Decimal(0.00)
                 bi12_fac_compras = Decimal(0.00)
+                bi14_fac_compras = Decimal(0.00)
                 iva_fac_compras = invoice.tax_amount
                 total_iva_fac_compras += invoice.tax_amount
                 ret_10_fuente = Decimal(0.00)
