@@ -1562,6 +1562,7 @@ class ReportSummaryPurchases(Report):
         localcontext['purchases'] = cls._get_purchases(Period, period)
         localcontext['total_bi0_fac_compras'] = cls._total_bi0_fac_compras(Period, period)
         localcontext['total_bi12_fac_compras'] = cls._total_bi12_fac_compras(Period, period)
+        localcontext['total_bi14_fac_compras'] = cls._total_bi14_fac_compras(Period, period)
         localcontext['total_iva_fac_compras'] = cls._total_iva_fac_compras(Period, period)
         localcontext['total_fac_compras'] =  cls._total_fac_compras(Period, period)
 
@@ -1578,6 +1579,7 @@ class ReportSummaryPurchases(Report):
         invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
         total_bi0_fac_compras = Decimal(0.00)
         total_bi12_fac_compras = Decimal(0.00)
+        total_bi14_fac_compras = Decimal(0.00)
         total_iva_fac_compras = Decimal(0.00)
         total_ret_10_fuente = Decimal(0.00)
         total_ret_1_fuente = Decimal(0.00)
@@ -1667,6 +1669,9 @@ class ReportSummaryPurchases(Report):
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_compras += (line.amount)
                                 total_bi12_fac_compras += line.amount
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi14_fac_compras += (line.amount)
+                                total_bi14_fac_compras += line.amount
                     elif taxes2:
                         for t in taxes2:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -1675,6 +1680,9 @@ class ReportSummaryPurchases(Report):
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_compras += (line.amount)
                                 total_bi12_fac_compras += line.amount
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi14_fac_compras += (line.amount)
+                                total_bi14_fac_compras += line.amount
                     elif taxes3:
                         for t in taxes3:
                             if str('{:.0f}'.format(t.tax.rate*100)) == '0':
@@ -1683,11 +1691,15 @@ class ReportSummaryPurchases(Report):
                             if str('{:.0f}'.format(t.tax.rate*100)) == '12':
                                 bi12_fac_compras += (line.amount)
                                 total_bi12_fac_compras += line.amount
+                            if str('{:.0f}'.format(t.tax.rate*100)) == '14':
+                                bi14_fac_compras += (line.amount)
+                                total_bi14_fac_compras += line.amount
                 cont += 1
                 lineas = {}
                 lineas['id'] = cont
                 lineas['number'] = invoice.reference
                 lineas['date'] = invoice.invoice_date
+                lineas['subtotal14'] = bi14_fac_compras
                 lineas['subtotal12'] = bi12_fac_compras
                 lineas['subtotal0'] = bi0_fac_compras
                 lineas['iva'] = iva_fac_compras
@@ -1741,6 +1753,22 @@ class ReportSummaryPurchases(Report):
         return total_bi12_fac_compras
 
     @classmethod
+    def _total_bi14_fac_compras(cls, Period, period):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        invoices = Invoice.search([('type','=','in_invoice'), ('state','in',['posted','paid']), ('invoice_date', '>=', period.start_date), ('invoice_date', '<=', period.end_date)])
+        total_bi14_fac_compras= Decimal(0.00)
+
+        if invoices:
+            for invoice in invoices:
+                for line in invoice.lines:
+                    if  line.taxes:
+                        for t in line.taxes:
+                            if str('{:.0f}'.format(t.rate*100)) == '14':
+                                total_bi14_fac_compras += line.amount
+        return total_bi14_fac_compras
+
+    @classmethod
     def _total_iva_fac_compras(cls, Period, period):
         pool = Pool()
         Invoice = pool.get('account.invoice')
@@ -1762,6 +1790,7 @@ class ReportSummaryPurchases(Report):
         total_iva_fac_compras = Decimal(0.00)
         total_bi0_fac_compras = Decimal(0.00)
         total_bi12_fac_compras = Decimal(0.00)
+        total_bi14_fac_compras = Decimal(0.00)
 
 
         if invoices:
@@ -1775,7 +1804,10 @@ class ReportSummaryPurchases(Report):
                         for t in line.taxes:
                             if str('{:.0f}'.format(t.rate*100)) == '12':
                                 total_bi12_fac_compras+= line.amount
+                        for t in line.taxes:
+                            if str('{:.0f}'.format(t.rate*100)) == '14':
+                                total_bi14_fac_compras+= line.amount
 
-            total_fac_compras = (total_iva_fac_compras + total_bi0_fac_compras + total_bi12_fac_compras)
+            total_fac_compras = (total_iva_fac_compras + total_bi0_fac_compras + total_bi12_fac_compras+total_bi14_fac_compras)
 
         return total_fac_compras
